@@ -18,6 +18,10 @@ TILP::TILP(int tip, int ring***REMOVED*** {
 	ring_ = ring;
 }
 
+void TILP::begin(***REMOVED*** {
+	resetLines(***REMOVED***;
+}
+
 // Send an entire message from the Arduino to
 // the attached TI device, byte by byte
 int TILP::send(uint8_t* header, uint8_t* data, int datalength***REMOVED*** {
