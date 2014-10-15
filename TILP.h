@@ -52,7 +52,7 @@ class TILP {
 	public:
 		TILP(***REMOVED***;
 		TILP(int tip, int ring***REMOVED***;
-        void begin(***REMOVED***;
+		void begin(***REMOVED***;
 		int send(uint8_t* header, uint8_t* data, int datalength***REMOVED***;
 		int get(uint8_t* header, uint8_t* data, int* datalength, int maxlength***REMOVED***;
 		void resetLines(***REMOVED***;
