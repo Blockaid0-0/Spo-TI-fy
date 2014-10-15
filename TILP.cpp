@@ -21,8 +21,6 @@ TILP::TILP(int tip, int ring***REMOVED*** {
 // Send an entire message from the Arduino to
 // the attached TI device, byte by byte
 int TILP::send(uint8_t* header, uint8_t* data, int datalength***REMOVED*** {
-	long previousMillis = 0;
-
 	// Send all of the bytes in the header
 	for(int idx = 0; idx < 4; idx++***REMOVED*** {
 		int rval = sendByte(header[idx]***REMOVED***;
@@ -77,8 +75,10 @@ int TILP::sendByte(uint8_t byte***REMOVED*** {
 		// Wait for both lines to be high before sending the bit
 		previousMillis = 0;
 		while (digitalRead(ring_***REMOVED*** == LOW || digitalRead(tip_***REMOVED*** == LOW***REMOVED*** {
-			if (previousMillis++ > TIMEOUT***REMOVED***
+			if (previousMillis++ > TIMEOUT***REMOVED*** {
+				resetLines(***REMOVED***;
 				return ERR_WRITE_TIMEOUT;
+			}
 		}
 		
 		// Pull one line low to indicate a new bit is going out
@@ -91,16 +91,20 @@ int TILP::sendByte(uint8_t byte***REMOVED*** {
 		line = (bitval***REMOVED***?tip_:ring_;
 		previousMillis = 0;
 		while (digitalRead(line***REMOVED*** == HIGH***REMOVED*** {
-			if (previousMillis++ > TIMEOUT***REMOVED***
+			if (previousMillis++ > TIMEOUT***REMOVED*** {
+				resetLines(***REMOVED***;
 				return ERR_WRITE_TIMEOUT;
+			}
 		}
 
 		// Wait for peer to indicate readiness by releasing that line
 		resetLines(***REMOVED***;
 		previousMillis = 0;
 		while (digitalRead(line***REMOVED*** == LOW***REMOVED*** {
-			if (previousMillis++ > TIMEOUT***REMOVED***
+			if (previousMillis++ > TIMEOUT***REMOVED*** {
+				resetLines(***REMOVED***;
 				return ERR_WRITE_TIMEOUT;
+			}
 		}
 		
 		// Rotate the next bit to send into the low bit of the byte
@@ -183,8 +187,10 @@ int TILP::getByte(uint8_t* byte***REMOVED*** {
 
 		previousMillis = 0;
 		while ((linevals = (digitalRead(ring_***REMOVED*** << 1 | digitalRead(tip_***REMOVED******REMOVED******REMOVED*** == 0x03***REMOVED*** {
-			if (previousMillis++ > GET_ENTER_TIMEOUT***REMOVED***
+			if (previousMillis++ > GET_ENTER_TIMEOUT***REMOVED*** {
+				resetLines(***REMOVED***;
 				return ERR_READ_TIMEOUT;
+			}
 		}
 		
 		// Store the bit, then acknowledge it
@@ -197,8 +203,10 @@ int TILP::getByte(uint8_t* byte***REMOVED*** {
 		line = (linevals == 0x01***REMOVED***?ring_:tip_;		
 		previousMillis = 0;
 		while (digitalRead(line***REMOVED*** == LOW***REMOVED*** {            //wait for the other one to go low
-			if (previousMillis++ > TIMEOUT***REMOVED***
+			if (previousMillis++ > TIMEOUT***REMOVED*** {
+				resetLines(***REMOVED***;
 				return ERR_READ_TIMEOUT;
+			}
 		}
 		digitalWrite(line,HIGH***REMOVED***;
 		
