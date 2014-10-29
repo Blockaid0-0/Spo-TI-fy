@@ -34,7 +34,7 @@ void TILP::begin(***REMOVED*** {
 void TILP::setVerbosity(bool verbose, HardwareSerial* serial***REMOVED*** {
 	if (verbose***REMOVED*** {
 		serial_ = serial;
-	else {
+	} else {
 		serial_ = NULL;
 	}
 }

@@ -30,7 +30,7 @@ class CBL2: public TILP {
 	public:
 		CBL2(***REMOVED***;
 		CBL2(int tip, int ring***REMOVED***;
-		
+
 		// Methods for emulating a calculator, talking to a CBL2
 		int getFromCBL2(uint8_t type, uint8_t* header, uint8_t* data, int* datalength, int maxlength***REMOVED***;
 		int sendToCBL2(uint8_t type, uint8_t* header, uint8_t* data, int datalength***REMOVED***;
@@ -42,6 +42,7 @@ class CBL2: public TILP {
 		int eventLoopTick(***REMOVED***;						// Usually called in loop(***REMOVED***
 
 	private:
+		bool verbose_;
 		bool callback_init;
 		uint8_t* header_;							// Variable header, not msg header, returned to callbacks!
 		uint8_t* data_;								// Variable data returned to callbacks

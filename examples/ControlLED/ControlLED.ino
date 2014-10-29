@@ -13,6 +13,7 @@ void setup(***REMOVED*** {
   Serial.begin(9600***REMOVED***;
   cbl = new CBL2(lineRed, lineWhite***REMOVED***;
   cbl->resetLines(***REMOVED***;
+  cbl->setVerbosity(true, &Serial***REMOVED***;
   cbl->setupCallbacks(header, data, MAXDATALEN,
                       onGetAsCBL2, onSendAsCBL2***REMOVED***;
 }
