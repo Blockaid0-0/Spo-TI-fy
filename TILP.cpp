@@ -12,7 +12,7 @@
 TILP::TILP(***REMOVED*** {
 	tip_ = DEFAULT_TIP;
 	ring_ = DEFAULT_RING;
-	HardwareSerial = NULL;
+	serial_ = NULL;
 }
 
 // Constructor with custom communication lines. Fun
@@ -21,7 +21,7 @@ TILP::TILP(***REMOVED*** {
 TILP::TILP(int tip, int ring***REMOVED*** {
 	tip_ = tip;
 	ring_ = ring;
-	HardwareSerial = NULL;
+	serial_ = NULL;
 }
 
 // This should be called during the setup(***REMOVED*** function
@@ -32,13 +32,17 @@ void TILP::begin(***REMOVED*** {
 
 // Determine whether debug printing is enabled
 void TILP::setVerbosity(bool verbose, HardwareSerial* serial***REMOVED*** {
-	serial_ = serial;
+	if (verbose***REMOVED*** {
+		serial_ = serial;
+	else {
+		serial_ = NULL;
+	}
 }
 
 // Send an entire message from the Arduino to
 // the attached TI device, byte by byte
 int TILP::send(uint8_t* header, uint8_t* data, int datalength***REMOVED*** {
-	if (HardwareSerial***REMOVED*** {
+	if (serial_***REMOVED*** {
 		serial_->print("Sending message type 0x"***REMOVED***;
 		serial_->print(header[1], HEX***REMOVED***;
 		serial_->print(" to endpoint 0x"***REMOVED***;
@@ -162,7 +166,7 @@ int TILP::get(uint8_t* header, uint8_t* data, int* datalength, int maxlength***R
 	if (*datalength > maxlength***REMOVED***
 		return ERR_BUFFER_OVERFLOW;
 	
-	if (HardwareSerial***REMOVED*** {
+	if (serial_***REMOVED*** {
 		serial_->print("Receiving message type 0x"***REMOVED***;
 		serial_->print(header[1], HEX***REMOVED***;
 		serial_->print(" from endpoint 0x"***REMOVED***;
