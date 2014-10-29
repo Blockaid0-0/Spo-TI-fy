@@ -22,6 +22,7 @@ CBL2::CBL2(***REMOVED*** :
 CBL2::CBL2(int tip, int ring***REMOVED*** :
 	TILP(tip, ring***REMOVED***
 {
+	return;
 }
 
 int CBL2::getFromCBL2(uint8_t type, uint8_t* header, uint8_t* data, int* datalength, int maxlength***REMOVED*** {
@@ -29,5 +30,24 @@ int CBL2::getFromCBL2(uint8_t type, uint8_t* header, uint8_t* data, int* datalen
 }
 
 int CBL2::sendToCBL2(uint8_t type, uint8_t* header, uint8_t* data, int datalength***REMOVED*** {
+	return -1;
+}
+
+int CBL2::setupCallbacks(uint8_t* header, uint8_t* data, int maxlength,
+				   int (*get_callback***REMOVED***(uint8_t, int***REMOVED***,
+				   int (*send_callback***REMOVED***(uint8_t, int****REMOVED******REMOVED***
+{
+	header_ = header;
+	data_ = data;
+	maxlength_ = maxlength;
+	get_callback_ = get_callback;
+	send_callback_ = send_callback;
+	callback_init = true;
+}
+
+int CBL2::eventLoopTick(***REMOVED*** {
+	if (!callback_init***REMOVED***
+		return -1;
+		
 	return -1;
 }
