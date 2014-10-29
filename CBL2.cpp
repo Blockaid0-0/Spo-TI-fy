@@ -43,6 +43,7 @@ int CBL2::setupCallbacks(uint8_t* header, uint8_t* data, int maxlength,
 	get_callback_ = get_callback;
 	send_callback_ = send_callback;
 	callback_init = true;
+	return 0;
 }
 
 int CBL2::eventLoopTick(***REMOVED*** {
@@ -55,9 +56,9 @@ int CBL2::eventLoopTick(***REMOVED*** {
 		return -1;
 	
 	// See if there's a message coming
-	int rval = get(msg_header, data_, length, maxlength_***REMOVED***;
+	rval = get(msg_header, data_, &length, maxlength_***REMOVED***;
 	if (rval***REMOVED***
-		return;			// No message coming
+		return 0;			// No message coming
 		
 	// Deduce what kind of operation is happening
 	// CBL2 responds to TI-82 as 0x12, "0x95" endpoint as 0x15
@@ -93,7 +94,7 @@ int CBL2::eventLoopTick(***REMOVED*** {
 			send(msg_header, NULL, 0***REMOVED***;
 			
 			// Deliver the data to the callback
-			rval = get_callback_(header_[1], length***REMOVED***;		// Ignore rval for now	
+			rval = get_callback_(header_[3], length***REMOVED***;		// Ignore rval for now	
 			break;
 	
 		case EOT:
@@ -103,6 +104,42 @@ int CBL2::eventLoopTick(***REMOVED*** {
 			msg_header[2] = msg_header[3] = 0x00;
 			send(msg_header, NULL, 0***REMOVED***;
 			break;
+		
+		case REQ:
+			// Send an ACK
+			msg_header[0] = endpoint;
+			msg_header[1] = ACK;
+			msg_header[2] = msg_header[3] = 0x00;
+			send(msg_header, NULL, 0***REMOVED***;
 			
-	return -1;
+			// Get the header and data from the callback
+			send_callback_(header_[3], &datalength_***REMOVED***;
+			
+			// Send the VAR message
+			msg_header[0] = endpoint;
+			msg_header[1] = VAR;
+			msg_header[2] = 0x0B;
+			msg_header[3] = 0x00;
+			send(msg_header, header_, 0x0B***REMOVED***;
+			
+			break;
+			
+		case CTS:
+			// Send an ACK
+			msg_header[0] = endpoint;
+			msg_header[1] = ACK;
+			msg_header[2] = msg_header[3] = 0x00;
+			send(msg_header, NULL, 0***REMOVED***;
+			
+			// Send the DATA
+			msg_header[0] = endpoint;
+			msg_header[1] = VAR;
+			msg_header[2] = (datalength_ & 0x00ff***REMOVED***;
+			msg_header[3] = (datalength_ >> 8***REMOVED***;
+			send(msg_header, data_, datalength_***REMOVED***;
+			
+			break;
+	}
+			
+	return 0;
 }
