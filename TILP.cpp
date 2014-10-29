@@ -12,6 +12,7 @@
 TILP::TILP(***REMOVED*** {
 	tip_ = DEFAULT_TIP;
 	ring_ = DEFAULT_RING;
+	verbose_ = false;
 }
 
 // Constructor with custom communication lines. Fun
@@ -20,6 +21,7 @@ TILP::TILP(***REMOVED*** {
 TILP::TILP(int tip, int ring***REMOVED*** {
 	tip_ = tip;
 	ring_ = ring;
+	verbose_ = false;
 }
 
 // This should be called during the setup(***REMOVED*** function
@@ -28,9 +30,24 @@ void TILP::begin(***REMOVED*** {
 	resetLines(***REMOVED***;
 }
 
+// Determine whether debug printing is enabled
+void TILP::setVerbosity(bool verbose, HardwareSerial* serial***REMOVED*** {
+	verbose_ = verbose;
+	serial_ = serial;
+}
+
 // Send an entire message from the Arduino to
 // the attached TI device, byte by byte
 int TILP::send(uint8_t* header, uint8_t* data, int datalength***REMOVED*** {
+	if (verbose_***REMOVED*** {
+		serial_->print("Sending message type 0x"***REMOVED***;
+		serial_->print(header[1], HEX***REMOVED***;
+		serial_->print(" to endpoint 0x"***REMOVED***;
+		serial_->print(header[0], HEX***REMOVED***;
+		serial_->print(" length "***REMOVED***;
+		serial_->println(datalength***REMOVED***;
+	}
+
 	// Send all of the bytes in the header
 	for(int idx = 0; idx < 4; idx++***REMOVED*** {
 		int rval = sendByte(header[idx]***REMOVED***;
@@ -39,8 +56,9 @@ int TILP::send(uint8_t* header, uint8_t* data, int datalength***REMOVED*** {
 	}
 	
 	// If no data, we're done
-	if (datalength == 0***REMOVED***
+	if (datalength == 0***REMOVED*** {
 		return 0;
+	}
 	
 	// These  also indicate that there are 
 	// no data bytes to be sent
@@ -145,6 +163,15 @@ int TILP::get(uint8_t* header, uint8_t* data, int* datalength, int maxlength***R
 	if (*datalength > maxlength***REMOVED***
 		return ERR_BUFFER_OVERFLOW;
 	
+	if (verbose_***REMOVED*** {
+		serial_->print("Receiving message type 0x"***REMOVED***;
+		serial_->print(header[1], HEX***REMOVED***;
+		serial_->print(" from endpoint 0x"***REMOVED***;
+		serial_->print(header[0], HEX***REMOVED***;
+		serial_->print(" length "***REMOVED***;
+		serial_->println(*datalength***REMOVED***;
+	}
+
 	// These  also indicate that there are 
 	// no data bytes to be received
 	if (header[1] == CTS ||
