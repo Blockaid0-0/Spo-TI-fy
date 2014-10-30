@@ -45,7 +45,7 @@ int TILP::send(uint8_t* header, uint8_t* data, int datalength***REMOVED*** {
 	if (serial_***REMOVED*** {
 		serial_->print("Sending message type 0x"***REMOVED***;
 		serial_->print(header[1], HEX***REMOVED***;
-		serial_->print(" to endpoint 0x"***REMOVED***;
+		serial_->print(" as endpoint 0x"***REMOVED***;
 		serial_->print(header[0], HEX***REMOVED***;
 		serial_->print(" length "***REMOVED***;
 		serial_->println(datalength***REMOVED***;
@@ -158,13 +158,7 @@ int TILP::get(uint8_t* header, uint8_t* data, int* datalength, int maxlength***R
 		if (rval***REMOVED***
 			return rval;
 	}
-	
-	// Check if this is a data-free message
 	*datalength = (int***REMOVED***header[2] | ((int***REMOVED***header[3] << 8***REMOVED***;
-	if (*datalength == 0***REMOVED***;
-		return 0;
-	if (*datalength > maxlength***REMOVED***
-		return ERR_BUFFER_OVERFLOW;
 	
 	if (serial_***REMOVED*** {
 		serial_->print("Receiving message type 0x"***REMOVED***;
@@ -174,6 +168,9 @@ int TILP::get(uint8_t* header, uint8_t* data, int* datalength, int maxlength***R
 		serial_->print(" length "***REMOVED***;
 		serial_->println(*datalength***REMOVED***;
 	}
+
+	if (*datalength == 0***REMOVED***
+		return 0;
 
 	// These  also indicate that there are 
 	// no data bytes to be received
@@ -187,6 +184,17 @@ int TILP::get(uint8_t* header, uint8_t* data, int* datalength, int maxlength***R
 		header[1] == EOT***REMOVED***
 	{
 		return 0;
+	}
+	
+	// Check if this is a data-free message
+	if (*datalength > maxlength***REMOVED*** {
+		if (serial_***REMOVED*** {
+			serial_->print("Message overflowing buffer: "***REMOVED***;
+			serial_->print(*datalength***REMOVED***;
+			serial_->print(" > "***REMOVED***;
+			serial_->println(maxlength***REMOVED***;
+		}
+		return ERR_BUFFER_OVERFLOW;
 	}
 	
 	// Get the data bytes, if there are any.
@@ -211,7 +219,7 @@ int TILP::get(uint8_t* header, uint8_t* data, int* datalength, int maxlength***R
 	}
 	
 	// Die on a bad checksum
-	if (checksum != (uint8_t***REMOVED***(((int***REMOVED***recv_checksum[1] << 8***REMOVED*** | (int***REMOVED***recv_checksum[0]***REMOVED******REMOVED***
+	if (checksum != (uint16_t***REMOVED***(((int***REMOVED***recv_checksum[1] << 8***REMOVED*** | (int***REMOVED***recv_checksum[0]***REMOVED******REMOVED***
 		return ERR_BAD_CHECKSUM;
 		
 	return 0;
@@ -228,7 +236,7 @@ int TILP::getByte(uint8_t* byte***REMOVED*** {
 		int linevals;
 
 		previousMillis = 0;
-		while ((linevals = (digitalRead(ring_***REMOVED*** << 1 | digitalRead(tip_***REMOVED******REMOVED******REMOVED*** == 0x03***REMOVED*** {
+		while ((linevals = ((digitalRead(ring_***REMOVED*** << 1***REMOVED*** | digitalRead(tip_***REMOVED******REMOVED******REMOVED*** == 0x03***REMOVED*** {
 			if (previousMillis++ > GET_ENTER_TIMEOUT***REMOVED*** {
 				resetLines(***REMOVED***;
 				return ERR_READ_TIMEOUT;
@@ -236,7 +244,7 @@ int TILP::getByte(uint8_t* byte***REMOVED*** {
 		}
 		
 		// Store the bit, then acknowledge it
-		*byte = (*byte >> 1***REMOVED*** | ((linevals == 0x01***REMOVED***?0x80:0x7f***REMOVED***;
+		*byte = (*byte >> 1***REMOVED*** | ((linevals == 0x01***REMOVED***?0x80:0x00***REMOVED***;
 		int line = (linevals == 0x01***REMOVED***?tip_:ring_;
 		pinMode(line, OUTPUT***REMOVED***;
 		digitalWrite(line, LOW***REMOVED***;
@@ -250,8 +258,8 @@ int TILP::getByte(uint8_t* byte***REMOVED*** {
 				return ERR_READ_TIMEOUT;
 			}
 		}
-		digitalWrite(line,HIGH***REMOVED***;
-		
+
+		// Now set them both high and to input
 		resetLines(***REMOVED***;
 	}
 	return 0;

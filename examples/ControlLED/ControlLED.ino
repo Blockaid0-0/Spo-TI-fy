@@ -29,13 +29,13 @@ void loop(***REMOVED*** {
 int onGetAsCBL2(uint8_t type, int datalen***REMOVED*** {
   Serial.print("Got variable of type "***REMOVED***;
   Serial.print(type***REMOVED***;
-  Serial.println("from calculator."***REMOVED***;
+  Serial.println(" from calculator."***REMOVED***;
   return 0;
 }
 
 int onSendAsCBL2(uint8_t type, int* datalen***REMOVED*** {
   Serial.print("Got request for variable of type "***REMOVED***;
   Serial.print(type***REMOVED***;
-  Serial.println("from calculator."***REMOVED***;
+  Serial.println(" from calculator."***REMOVED***;
   return -1;
 }
