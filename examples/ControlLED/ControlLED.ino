@@ -1,26 +1,52 @@
+/*************************************************
+ *  ControlLED.ino                               *
+ *  Example from the ArduinoTILP library         *
+ *           Created by Christopher Mitchell,    *
+ *           2011-2014, all rights reserved.     *
+ *                                               *
+ *  This demo communicates as if it was a CBL2   *
+ *  device. Use Send({0}***REMOVED*** to send a 1-element    *
+ *  list to the Arduino and control the state    *
+ *  of digital output lines. You can expand      *
+ *  this demo to read or write any GPIO lines.   *
+ *                                               *
+ *  In its current state, send a value between   *
+ *  0 and 15 as the single element of a 1-       *
+ *  element list to control digital pins 8, 9,   *
+ *  10, and 13.                                  *
+ *************************************************/
+
 #include "CBL2.h"
 
 CBL2* cbl;
 int lineRed = 7;
 int lineWhite = 6;
-int ledPin = 13;
+
+#define LED_PIN_COUNT 4
+int ledPins[LED_PIN_COUNT] = {8, 9, 10, 13};
 
 #define MAXDATALEN 255
 uint8_t header[16];
 uint8_t data[MAXDATALEN];
 
 void setup(***REMOVED*** {
+  for(int i = 0; i < LED_PIN_COUNT; i++***REMOVED*** {
+    pinMode(ledPins[i], OUTPUT***REMOVED***;
+	digitalWrite(ledPins[i], LOW***REMOVED***;
+  }
+
   Serial.begin(9600***REMOVED***;
   cbl = new CBL2(lineRed, lineWhite***REMOVED***;
   cbl->resetLines(***REMOVED***;
-  cbl->setVerbosity(true, &Serial***REMOVED***;
+  // cbl->setVerbosity(true, &Serial***REMOVED***;			// Comment this in for mesage information
   cbl->setupCallbacks(header, data, MAXDATALEN,
                       onGetAsCBL2, onSendAsCBL2***REMOVED***;
 }
 
 void loop(***REMOVED*** {
   int rval;
-  if (rval = cbl->eventLoopTick(***REMOVED******REMOVED*** {
+  rval = cbl->eventLoopTick(***REMOVED***;
+  if (rval && rval != ERR_READ_TIMEOUT***REMOVED*** {
     Serial.print("Failed to run eventLoopTick: code "***REMOVED***;
     Serial.println(rval***REMOVED***;
   }
@@ -30,6 +56,31 @@ int onGetAsCBL2(uint8_t type, int datalen***REMOVED*** {
   Serial.print("Got variable of type "***REMOVED***;
   Serial.print(type***REMOVED***;
   Serial.println(" from calculator."***REMOVED***;
+  
+  // Turn the LEDs on or off
+  int list_len = data[0] | (data[1] << 8***REMOVED***;
+  if (list_len == 1***REMOVED*** {
+    // It is a 1-element list now
+    if (data[2] == 0***REMOVED*** {
+      // 1-element list where element 1 is positive
+	  int16_t exp = ((int16_t***REMOVED***data[3]***REMOVED*** - 0x80;
+	  if (exp >= 0 && exp <= 1***REMOVED*** {
+	    // Compute the single number sent
+		int value = (10 * (data[4] >> 4***REMOVED*** + (data[4] & 0x0f***REMOVED******REMOVED*** / (exp?1:10***REMOVED***;
+		Serial.print("Received value "***REMOVED***;
+		Serial.println(value***REMOVED***;
+		for(int i = 0; i < LED_PIN_COUNT; i++***REMOVED*** {
+          digitalWrite(ledPins[i], (value >> i***REMOVED*** & 0x01***REMOVED***;
+		}
+	  } else {
+        Serial.println("list element 1 must be a value 0-15"***REMOVED***;
+	  }
+    } else {
+      Serial.println("list element 1 must be positive"***REMOVED***;
+    }
+  } else {
+    Serial.println("Must send a 1-element list!"***REMOVED***;
+  }
   return 0;
 }
 
