@@ -10,14 +10,14 @@
  *  serial console.                              *
  *************************************************/
 
-#include <TICL.h>
+#include <TILP.h>
 
-TICL ticl = TICL(3, 2***REMOVED***;
+TILP tilp = TILP(3, 2***REMOVED***;
 
 void setup(***REMOVED*** {
   pinMode(4, INPUT_PULLUP***REMOVED***;
   Serial.begin(9600***REMOVED***;
-  ticl.resetLines(***REMOVED***;
+  tilp.resetLines(***REMOVED***;
   delay(1000***REMOVED***;
 }
 
@@ -26,14 +26,14 @@ void loop(***REMOVED*** {
     Serial.println("Starting transfer..."***REMOVED***;
     uint8_t screen[768+2];
     uint8_t msg[4] = {0x73, 0x6D, 0x00, 0x00};
-    ticl.send(msg, NULL, 0***REMOVED***;
+    tilp.send(msg, NULL, 0***REMOVED***;
     Serial.println("Sent request"***REMOVED***;
     int rlen = 0;
-    ticl.get(msg, NULL, &rlen, 0***REMOVED***;
+    tilp.get(msg, NULL, &rlen, 0***REMOVED***;
     Serial.println("Recieved acknowledgement"***REMOVED***;
-    ticl.get(NULL, screen, &rlen, 768+2***REMOVED***;
+    tilp.get(NULL, screen, &rlen, 768+2***REMOVED***;
     Serial.println("Recieved screenshot"***REMOVED***;
-    ticl.send(msg, NULL, 0***REMOVED***;
+    tilp.send(msg, NULL, 0***REMOVED***;
     Serial.println("Sent acknowledgement"***REMOVED***;
     for (int i = 1; i <= 768; i++***REMOVED*** {
       for (int j = 7; j > -1; j--***REMOVED*** {

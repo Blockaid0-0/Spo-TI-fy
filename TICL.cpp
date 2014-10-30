@@ -1,24 +1,24 @@
 /*************************************************
- *  TILP.h - Library for linking TI calculators  *
- *           and Arduinos.                       *
- *           Created by Christopher Mitchell,    *
- *           2011-2014, all rights reserved.     *
+ * TICL.cpp - Core of ArTICL library for linking *
+ *            TI calculators and Arduinos.       *
+ *            Created by Christopher Mitchell,   *
+ *            2011-2014, all rights reserved.    *
  *************************************************/
 
 #include "Arduino.h"
-#include "TILP.h"
+#include "TICL.h"
 
 // Constructor with default communication lines
-TILP::TILP(***REMOVED*** {
+TICL::TICL(***REMOVED*** {
 	tip_ = DEFAULT_TIP;
 	ring_ = DEFAULT_RING;
 	serial_ = NULL;
 }
 
 // Constructor with custom communication lines. Fun
-// fact: You can use this and multiple TILP objects to
+// fact: You can use this and multiple TICL objects to
 // talk to multiple endpoints at the same time.
-TILP::TILP(int tip, int ring***REMOVED*** {
+TICL::TICL(int tip, int ring***REMOVED*** {
 	tip_ = tip;
 	ring_ = ring;
 	serial_ = NULL;
@@ -26,12 +26,12 @@ TILP::TILP(int tip, int ring***REMOVED*** {
 
 // This should be called during the setup(***REMOVED*** function
 // to set the communication lines to their initial values
-void TILP::begin(***REMOVED*** {
+void TICL::begin(***REMOVED*** {
 	resetLines(***REMOVED***;
 }
 
 // Determine whether debug printing is enabled
-void TILP::setVerbosity(bool verbose, HardwareSerial* serial***REMOVED*** {
+void TICL::setVerbosity(bool verbose, HardwareSerial* serial***REMOVED*** {
 	if (verbose***REMOVED*** {
 		serial_ = serial;
 	} else {
@@ -41,7 +41,7 @@ void TILP::setVerbosity(bool verbose, HardwareSerial* serial***REMOVED*** {
 
 // Send an entire message from the Arduino to
 // the attached TI device, byte by byte
-int TILP::send(uint8_t* header, uint8_t* data, int datalength***REMOVED*** {
+int TICL::send(uint8_t* header, uint8_t* data, int datalength***REMOVED*** {
 	if (serial_***REMOVED*** {
 		serial_->print("Sending message type 0x"***REMOVED***;
 		serial_->print(header[1], HEX***REMOVED***;
@@ -97,7 +97,7 @@ int TILP::send(uint8_t* header, uint8_t* data, int datalength***REMOVED*** {
 
 // Send a single byte from the Arduino to the attached
 // TI device, returning nonzero if a failure occurred.
-int TILP::sendByte(uint8_t byte***REMOVED*** {
+int TICL::sendByte(uint8_t byte***REMOVED*** {
 	long previousMillis = 0;
 
 	// Send all of the bits in this byte
@@ -149,7 +149,7 @@ int TILP::sendByte(uint8_t byte***REMOVED*** {
 // for failure. If return value is 0 and datalength is zero,
 // then the message is just a 4-byte message in the header
 // buffer. If the 
-int TILP::get(uint8_t* header, uint8_t* data, int* datalength, int maxlength***REMOVED*** {
+int TICL::get(uint8_t* header, uint8_t* data, int* datalength, int maxlength***REMOVED*** {
 	int rval;
 
 	// Get the 4-byte header: sender, message, length
@@ -227,7 +227,7 @@ int TILP::get(uint8_t* header, uint8_t* data, int* datalength, int maxlength***R
 
 // Receive a single byte from the attached TI device,
 // returning nonzero if a failure occurred.
-int TILP::getByte(uint8_t* byte***REMOVED*** {
+int TICL::getByte(uint8_t* byte***REMOVED*** {
 	long previousMillis = 0;
 	*byte = 0;
 	
@@ -265,7 +265,7 @@ int TILP::getByte(uint8_t* byte***REMOVED*** {
 	return 0;
 }
 
-void TILP::resetLines(void***REMOVED*** {
+void TICL::resetLines(void***REMOVED*** {
 	pinMode(ring_, INPUT***REMOVED***;           // set pin to input
 	digitalWrite(ring_, HIGH***REMOVED***;       // turn on pullup resistors
 	pinMode(tip_, INPUT***REMOVED***;            // set pin to input
