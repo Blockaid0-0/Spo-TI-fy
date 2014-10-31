@@ -17,6 +17,7 @@
  *************************************************/
 
 #include "CBL2.h"
+#include "TIVar.h"
 
 CBL2* cbl;
 int lineRed = 7;
@@ -61,22 +62,11 @@ int onGetAsCBL2(uint8_t type, int datalen***REMOVED*** {
   int list_len = data[0] | (data[1] << 8***REMOVED***;
   if (list_len == 1***REMOVED*** {
     // It is a 1-element list now
-    if (data[2] == 0***REMOVED*** {
-      // 1-element list where element 1 is positive
-	  int16_t exp = ((int16_t***REMOVED***data[3]***REMOVED*** - 0x80;
-	  if (exp >= 0 && exp <= 1***REMOVED*** {
-	    // Compute the single number sent
-		int value = (10 * (data[4] >> 4***REMOVED*** + (data[4] & 0x0f***REMOVED******REMOVED*** / (exp?1:10***REMOVED***;
-		Serial.print("Received value "***REMOVED***;
-		Serial.println(value***REMOVED***;
-		for(int i = 0; i < LED_PIN_COUNT; i++***REMOVED*** {
-          digitalWrite(ledPins[i], (value >> i***REMOVED*** & 0x01***REMOVED***;
-		}
-	  } else {
-        Serial.println("list element 1 must be a value 0-15"***REMOVED***;
-	  }
-    } else {
-      Serial.println("list element 1 must be positive"***REMOVED***;
+	int value = (int***REMOVED***TIVar::realToFloat8x(&data[2]***REMOVED***;
+    Serial.print("Received value "***REMOVED***;
+    Serial.println(value***REMOVED***;
+    for(int i = 0; i < LED_PIN_COUNT; i++***REMOVED*** {
+      digitalWrite(ledPins[i], (value >> i***REMOVED*** & 0x01***REMOVED***;
     }
   } else {
     Serial.println("Must send a 1-element list!"***REMOVED***;
