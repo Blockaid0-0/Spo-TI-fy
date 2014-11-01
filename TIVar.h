@@ -21,12 +21,13 @@ enum RealType {
 
 class TIVar {
   public:
-	static double realToFloat8x(uint8_t* real, uint8_t model = CBL82***REMOVED***;
-	static int longToReal8x(long int n, uint8_t* real, uint8_t model = CBL85***REMOVED***;
-	static int floatToReal8x(double f, uint8_t* real, uint8_t model = CBL85***REMOVED***;
+	static double realToFloat8x(uint8_t* real, enum Endpoint model = CBL82***REMOVED***;
+	static int longToReal8x(long long int n, uint8_t* real, enum Endpoint model = CBL85***REMOVED***;
+	static int floatToReal8x(double f, uint8_t* real, enum Endpoint model = CBL85***REMOVED***;
 	static uint16_t sizeWordToInt(uint8_t* ptr***REMOVED***;
 	static void intToSizeWord(uint16_t size, uint8_t* ptr***REMOVED***;
+	static int sizeOfReal(enum Endpoint model***REMOVED***;
 
   private:
-	static RealType modelToType(uint8_t model***REMOVED***;
+	static RealType modelToType(enum Endpoint model***REMOVED***;
 };
