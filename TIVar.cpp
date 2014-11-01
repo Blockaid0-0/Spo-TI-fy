@@ -42,8 +42,47 @@ double TIVar::realToFloat8x(uint8_t* real***REMOVED*** {
 	return ieee_acc;
 }
 
+int TIVar::longToReal8x(long int n, uint8_t* real***REMOVED*** {
+	int16_t exp = 13;
+
+	// Set sign bit and get absolute value
+	real[0] = (n >= 0***REMOVED***?0x00:0x80;
+	n = (n > 0***REMOVED***?n:-n;
+	
+	// Bring large numbers down
+	while(n != 0 && n >= 10e13***REMOVED*** {
+		n /= 10;
+		exp += 1;
+	}
+	
+	// Bring small numbers up
+	while(n != 0 && n < 1e13***REMOVED*** {
+		n *= 10;
+		exp -= 1;
+	}
+
+	// Extract the digits
+	for(int8_t i=13; i >= 0; i--***REMOVED*** {
+		long n2 = (n/10***REMOVED***;
+		uint8_t cdigit = (uint8_t***REMOVED***(n - 10 * n2***REMOVED***;
+				
+		if ((i & 0x01***REMOVED*** == 1***REMOVED*** {
+			real[2 + (i >> 1***REMOVED***] = cdigit;
+		} else {
+			real[2 + (i >> 1***REMOVED***] |= (cdigit << 4***REMOVED***;
+		}
+		n = n2;
+	}
+	
+	// Set the exponent
+	exp += 0x80;
+	real[1] = (uint8_t***REMOVED***exp;
+
+	return 0;		// Success
+}
+
 int TIVar::floatToReal8x(double f, uint8_t* real***REMOVED*** {
-	int16_t exp = 0;
+	int16_t exp = 13;
 	
 	// Set sign bit and get absolute value
 	real[0] = (f >= 0***REMOVED***?0x00:0x80;
@@ -51,7 +90,7 @@ int TIVar::floatToReal8x(double f, uint8_t* real***REMOVED*** {
 	
 	// Bring large numbers down
 	while(f != 0 && f >= 10.e13***REMOVED*** {
-		f /= 10.f;
+		f *= 0.1f;
 		exp += 1;
 	}
 	
@@ -80,7 +119,7 @@ int TIVar::floatToReal8x(double f, uint8_t* real***REMOVED*** {
 	}
 	
 	// Set the exponent
-	exp += 0x80 + 13;
+	exp += 0x80;
 	real[1] = (uint8_t***REMOVED***exp;
 
 	return 0;		// Success
