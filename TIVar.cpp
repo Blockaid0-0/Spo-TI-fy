@@ -8,17 +8,29 @@
 
 #include "TIVar.h"
 
-double TIVar::realToFloat8x(uint8_t* real***REMOVED*** {
+double TIVar::realToFloat8x(uint8_t* real, uint8_t model***REMOVED*** {
     const double ieee_lut[10] = {0.f, 1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f, 9.f};
     int32_t dec_exp;
 	double ieee_acc = 0;
+	
+	// Figure out what type it is
+	enum RealType type = modelToType(model***REMOVED***;
+	if (type == 3***REMOVED***
+		return NAN;			// TI-89/TI-92 not yet implemented! TODO
     
 	// Convert the exponent
-	dec_exp = ((int16_t***REMOVED***real[1] - 0x80***REMOVED*** - 13;		// decimal point is followed by 13 digits
+	if (type == 1***REMOVED*** {
+		dec_exp = ((int16_t***REMOVED***real[1] - 0x80***REMOVED*** - 13;		// decimal point is followed by 13 digits
+	} else {
+		int32_t raw_exp = (int32_t***REMOVED***TIVar::sizeWordToInt(&real[1]***REMOVED***;
+		raw_exp -= 0x00fc00;
+		dec_exp = (int16_t***REMOVED***raw_exp;
+	}
 
 	// Convert the mantissa
+	const uint8_t mantissa_offset = (type == 1***REMOVED***?2:3;
 	for(uint8_t i = 0; i < 14; i++***REMOVED*** {
-		float digit = ieee_lut[0x0f & (real[2 + (i >> 1***REMOVED***] >> ((i & 0x01***REMOVED***?0:4***REMOVED******REMOVED***];
+		float digit = ieee_lut[0x0f & (real[mantissa_offset + (i >> 1***REMOVED***] >> ((i & 0x01***REMOVED***?0:4***REMOVED******REMOVED***];
 		ieee_acc = (10 * ieee_acc***REMOVED*** + digit;
 	}
 	
@@ -42,9 +54,14 @@ double TIVar::realToFloat8x(uint8_t* real***REMOVED*** {
 	return ieee_acc;
 }
 
-int TIVar::longToReal8x(long int n, uint8_t* real***REMOVED*** {
+int TIVar::longToReal8x(long int n, uint8_t* real, uint8_t model***REMOVED*** {
 	int16_t exp = 13;
 
+	// Figure out what type it is
+	enum RealType type = modelToType(model***REMOVED***;
+	if (type == 3***REMOVED***
+		return -1;			// TI-89/TI-92 not yet implemented! TODO
+    
 	// Set sign bit and get absolute value
 	real[0] = (n >= 0***REMOVED***?0x00:0x80;
 	n = (n > 0***REMOVED***?n:-n;
@@ -62,28 +79,42 @@ int TIVar::longToReal8x(long int n, uint8_t* real***REMOVED*** {
 	}
 
 	// Extract the digits
+	const uint8_t mantissa_offset = (type == 1***REMOVED***?2:3;
 	for(int8_t i=13; i >= 0; i--***REMOVED*** {
 		long n2 = (n/10***REMOVED***;
 		uint8_t cdigit = (uint8_t***REMOVED***(n - 10 * n2***REMOVED***;
-				
+
 		if ((i & 0x01***REMOVED*** == 1***REMOVED*** {
-			real[2 + (i >> 1***REMOVED***] = cdigit;
+			real[mantissa_offset + (i >> 1***REMOVED***] = cdigit;
 		} else {
-			real[2 + (i >> 1***REMOVED***] |= (cdigit << 4***REMOVED***;
+			real[mantissa_offset + (i >> 1***REMOVED***] |= (cdigit << 4***REMOVED***;
 		}
 		n = n2;
 	}
 	
 	// Set the exponent
-	exp += 0x80;
-	real[1] = (uint8_t***REMOVED***exp;
+	if (type == 1***REMOVED*** {
+		exp += 0x80;
+		real[1] = (uint8_t***REMOVED***exp;
 
-	return 0;		// Success
+	} else if (type == 2***REMOVED*** {
+		int32_t temp_exp = (int32_t***REMOVED***exp;
+		temp_exp += 0x00fc00;
+		real[1] = (uint8_t***REMOVED***(temp_exp & 0x00ff***REMOVED***;
+		real[2] = (uint8_t***REMOVED***((temp_exp >> 8***REMOVED*** & 0x00ff***REMOVED***;
+	}
+
+	return (type == 1***REMOVED***?9:10;		// Success: inserted data length
 }
 
-int TIVar::floatToReal8x(double f, uint8_t* real***REMOVED*** {
+int TIVar::floatToReal8x(double f, uint8_t* real, uint8_t model***REMOVED*** {
 	int16_t exp = 13;
 	
+	// Figure out what type it is
+	enum RealType type = modelToType(model***REMOVED***;
+	if (type == 3***REMOVED***
+		return -1;			// TI-89/TI-92 not yet implemented! TODO
+    
 	// Set sign bit and get absolute value
 	real[0] = (f >= 0***REMOVED***?0x00:0x80;
 	f = (f > 0***REMOVED***?f:-f;
@@ -101,6 +132,7 @@ int TIVar::floatToReal8x(double f, uint8_t* real***REMOVED*** {
 	}
 	
 	// Extract the digits
+	const uint8_t mantissa_offset = (type == 1***REMOVED***?2:3;
 	for(int8_t i=13; i >= 0; i--***REMOVED*** {
         double digit, odigit;
         digit = odigit = fmod(f, 10.***REMOVED***;
@@ -111,16 +143,68 @@ int TIVar::floatToReal8x(double f, uint8_t* real***REMOVED*** {
 		}
 		
 		if ((i & 0x01***REMOVED*** == 1***REMOVED*** {
-			real[2 + (i >> 1***REMOVED***] = cdigit;
+			real[mantissa_offset + (i >> 1***REMOVED***] = cdigit;
 		} else {
-			real[2 + (i >> 1***REMOVED***] |= (cdigit << 4***REMOVED***;
+			real[mantissa_offset + (i >> 1***REMOVED***] |= (cdigit << 4***REMOVED***;
 		}
 		f = (f - odigit***REMOVED*** / 10.f;
 	}
 	
 	// Set the exponent
-	exp += 0x80;
-	real[1] = (uint8_t***REMOVED***exp;
+	// Set the exponent
+	if (type == 1***REMOVED*** {
+		exp += 0x80;
+		real[1] = (uint8_t***REMOVED***exp;
 
-	return 0;		// Success
+	} else if (type == 2***REMOVED*** {
+		int32_t temp_exp = (int32_t***REMOVED***exp;
+		temp_exp += 0x00fc00;
+		real[1] = (uint8_t***REMOVED***(temp_exp & 0x00ff***REMOVED***;
+		real[2] = (uint8_t***REMOVED***((temp_exp >> 8***REMOVED*** & 0x00ff***REMOVED***;
+	}
+
+	return (type == 1***REMOVED***?9:10;		// Success: inserted data length
+}
+
+enum RealType TIVar::modelToType(uint8_t model***REMOVED*** {
+	switch(model***REMOVED*** {
+		case COMP82:
+		case CBL82:
+		case CALC82:
+			return REAL_82;
+			break;
+		case COMP83:
+		case COMP83P:
+		case CALC83P:
+		case CALC83:
+			return REAL_83;
+			break;
+		case COMP85:
+		case CBL85:
+		case CALC85a:
+		case CALC85b:
+			return REAL_85;
+			break;
+		case COMP86:
+			return REAL_86;
+			break;
+		case COMP89:
+		case CBL89:
+		case CALC89:
+			return REAL_89;
+			break;
+		default:
+			return REAL_INVALID;
+			break;
+	}
+}
+
+uint16_t TIVar::sizeWordToInt(uint8_t* ptr***REMOVED*** {
+	return ((uint16_t***REMOVED***ptr[0]***REMOVED*** | (((uint16_t***REMOVED***ptr[1]***REMOVED*** << 8***REMOVED***;
+}
+
+void TIVar::intToSizeWord(uint16_t size, uint8_t* ptr***REMOVED*** {
+	ptr[0] = (uint8_t***REMOVED***(size & 0x00ff***REMOVED***;
+	ptr[1] = (uint8_t***REMOVED***(size >> 8***REMOVED***;
+	return;
 }

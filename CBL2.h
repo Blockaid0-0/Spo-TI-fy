@@ -37,8 +37,8 @@ class CBL2: public TICL {
 		
 		// Methods for emulating a CBL2, talking to a calculator
 		int setupCallbacks(uint8_t* header, uint8_t* data, int maxlength,
-		                   int (*get_callback***REMOVED***(uint8_t, int***REMOVED***,
-						   int (*send_callback***REMOVED***(uint8_t, int****REMOVED******REMOVED***;
+		                   int (*get_callback***REMOVED***(uint8_t, enum Endpoint, int***REMOVED***,
+						   int (*send_callback***REMOVED***(uint8_t, enum Endpoint, int****REMOVED******REMOVED***;
 		int eventLoopTick(***REMOVED***;						// Usually called in loop(***REMOVED***
 
 	private:
@@ -48,8 +48,8 @@ class CBL2: public TICL {
 		uint8_t* data_;								// Variable data returned to callbacks
 		int datalength_;
 		int maxlength_;
-		int (*get_callback_***REMOVED***(uint8_t, int***REMOVED***;			// Called when calculator wants to get data
-		int (*send_callback_***REMOVED***(uint8_t, int****REMOVED***;		// Called when data received from calculator
+		int (*get_callback_***REMOVED***(uint8_t, enum Endpoint, int***REMOVED***;		// Called when calculator wants to get data
+		int (*send_callback_***REMOVED***(uint8_t, enum Endpoint, int****REMOVED***;	// Called when data received from calculator
 };
 
 #endif	// CBL2_H
