@@ -26,6 +26,8 @@ enum VarTypes {
 	VarComplex = 0x0c,
 };
 
+typedef uint8_t(*data_callback***REMOVED***(int***REMOVED***;
+
 class CBL2: public TICL {
 	public:
 		CBL2(***REMOVED***;
@@ -38,7 +40,7 @@ class CBL2: public TICL {
 		// Methods for emulating a CBL2, talking to a calculator
 		int setupCallbacks(uint8_t* header, uint8_t* data, int maxlength,
 		                   int (*get_callback***REMOVED***(uint8_t, enum Endpoint, int***REMOVED***,
-						   int (*send_callback***REMOVED***(uint8_t, enum Endpoint, int****REMOVED******REMOVED***;
+						   int (*send_callback***REMOVED***(uint8_t, enum Endpoint, int*, int*, data_callback****REMOVED******REMOVED***;
 		int eventLoopTick(***REMOVED***;						// Usually called in loop(***REMOVED***
 
 	private:
@@ -48,8 +50,9 @@ class CBL2: public TICL {
 		uint8_t* data_;								// Variable data returned to callbacks
 		int datalength_;
 		int maxlength_;
-		int (*get_callback_***REMOVED***(uint8_t, enum Endpoint, int***REMOVED***;		// Called when calculator wants to get data
-		int (*send_callback_***REMOVED***(uint8_t, enum Endpoint, int****REMOVED***;	// Called when data received from calculator
+		data_callback data_callback_;
+		int (*get_callback_***REMOVED***(uint8_t, enum Endpoint, int***REMOVED***;	// Called when data received from calculator
+		int (*send_callback_***REMOVED***(uint8_t, enum Endpoint, int*, int*, data_callback****REMOVED***;	// Called when calculator wants to get data
 };
 
 #endif	// CBL2_H

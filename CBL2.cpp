@@ -40,7 +40,7 @@ int CBL2::sendToCBL2(uint8_t type, uint8_t* header, uint8_t* data, int datalengt
 
 int CBL2::setupCallbacks(uint8_t* header, uint8_t* data, int maxlength,
 				   int (*get_callback***REMOVED***(uint8_t, enum Endpoint, int***REMOVED***,
-				   int (*send_callback***REMOVED***(uint8_t, enum Endpoint, int****REMOVED******REMOVED***
+				   int (*send_callback***REMOVED***(uint8_t, enum Endpoint, int*, int*, data_callback****REMOVED******REMOVED***
 {
 	header_ = header;
 	data_ = data;
@@ -64,7 +64,7 @@ int CBL2::eventLoopTick(***REMOVED*** {
 	rval = get(msg_header, data_, &length, maxlength_***REMOVED***;
 	if (rval***REMOVED*** {
 		if (serial_***REMOVED*** {
-			serial_->print("No incoming message: code "***REMOVED***;
+			serial_->print("No msg: code "***REMOVED***;
 			serial_->println(rval***REMOVED***;
 		}
 		return 0;			// No message coming
@@ -73,6 +73,7 @@ int CBL2::eventLoopTick(***REMOVED*** {
 	// Deduce what kind of operation is happening
 	// CBL2 responds to TI-82 as 0x12, "0x95" endpoint as 0x15
 	enum Endpoint model = (enum Endpoint***REMOVED***msg_header[0];
+	bool type_as_cbl = true;
 	switch(model***REMOVED*** {
 		case CALC82:
 			endpoint = CBL82;
@@ -83,6 +84,10 @@ int CBL2::eventLoopTick(***REMOVED*** {
 			break;
 		case CALC89:
 			endpoint = CBL89;
+			break;
+		case COMP83P:
+			type_as_cbl = false;
+			endpoint = CALC83P;
 			break;
 		default:
 			return -1;				// Unknown endpoint
@@ -129,7 +134,7 @@ int CBL2::eventLoopTick(***REMOVED*** {
 			send(msg_header, NULL, 0***REMOVED***;
 			break;
 		
-		case REQ:
+		case REQ: {
 			memcpy(header_, data_, length***REMOVED***;		// Save the variable header
 
 			// Send an ACK
@@ -139,16 +144,19 @@ int CBL2::eventLoopTick(***REMOVED*** {
 			send(msg_header, NULL, 0***REMOVED***;
 			
 			// Get the header and data from the callback
-			send_callback_(header_[3], model, &datalength_***REMOVED***;
+			data_callback_ = NULL;
+			int headerlength = 11;
+			send_callback_(header_[type_as_cbl ? 3 : 2], model,
+			               &headerlength, &datalength_, &data_callback_***REMOVED***;
 			
 			// Send the VAR message
 			msg_header[0] = endpoint;
 			msg_header[1] = VAR;
-			msg_header[2] = 0x0B;
+			msg_header[2] = headerlength;
 			msg_header[3] = 0x00;
-			send(msg_header, header_, 0x0B***REMOVED***;
-			
-			break;
+			send(msg_header, header_, headerlength***REMOVED***;
+		  }
+		  break;
 			
 		case CTS:
 			// Send an ACK
@@ -162,7 +170,7 @@ int CBL2::eventLoopTick(***REMOVED*** {
 			msg_header[1] = DATA;
 			msg_header[2] = (datalength_ & 0x00ff***REMOVED***;
 			msg_header[3] = (datalength_ >> 8***REMOVED***;
-			send(msg_header, data_, datalength_***REMOVED***;
+			send(msg_header, data_, datalength_, data_callback_***REMOVED***;
 			
 			break;
 	}

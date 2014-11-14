@@ -41,13 +41,13 @@ void TICL::setVerbosity(bool verbose, HardwareSerial* serial***REMOVED*** {
 
 // Send an entire message from the Arduino to
 // the attached TI device, byte by byte
-int TICL::send(uint8_t* header, uint8_t* data, int datalength***REMOVED*** {
+int TICL::send(uint8_t* header, uint8_t* data, int datalength, uint8_t(*data_callback***REMOVED***(int***REMOVED******REMOVED*** {
 	if (serial_***REMOVED*** {
-		serial_->print("Sending message type 0x"***REMOVED***;
+		serial_->print("snd type 0x"***REMOVED***;
 		serial_->print(header[1], HEX***REMOVED***;
-		serial_->print(" as endpoint 0x"***REMOVED***;
+		serial_->print(" as EP 0x"***REMOVED***;
 		serial_->print(header[0], HEX***REMOVED***;
-		serial_->print(" length "***REMOVED***;
+		serial_->print(" len "***REMOVED***;
 		serial_->println(datalength***REMOVED***;
 	}
 
@@ -80,11 +80,18 @@ int TICL::send(uint8_t* header, uint8_t* data, int datalength***REMOVED*** {
 	// Send all of the bytes in the data buffer
 	uint16_t checksum = 0;
 	for(int idx = 0; idx < datalength; idx++***REMOVED*** {
+		uint8_t outbyte;
+		// Get a byte if we need
+		if (data_callback != NULL***REMOVED*** {
+			outbyte = data_callback(idx***REMOVED***;
+		} else {
+			outbyte = data[idx];
+		}
 		// Try to send this byte
-		int rval = sendByte(data[idx]***REMOVED***;
+		int rval = sendByte(outbyte***REMOVED***;
 		if (rval != 0***REMOVED***
 			return rval;
-		checksum += data[idx];
+		checksum += outbyte;
 	}
 	
 	// Send the checksum
@@ -161,11 +168,11 @@ int TICL::get(uint8_t* header, uint8_t* data, int* datalength, int maxlength***R
 	*datalength = (int***REMOVED***header[2] | ((int***REMOVED***header[3] << 8***REMOVED***;
 	
 	if (serial_***REMOVED*** {
-		serial_->print("Receiving message type 0x"***REMOVED***;
+		serial_->print("Recv typ 0x"***REMOVED***;
 		serial_->print(header[1], HEX***REMOVED***;
-		serial_->print(" from endpoint 0x"***REMOVED***;
+		serial_->print(" from EP 0x"***REMOVED***;
 		serial_->print(header[0], HEX***REMOVED***;
-		serial_->print(" length "***REMOVED***;
+		serial_->print(" len "***REMOVED***;
 		serial_->println(*datalength***REMOVED***;
 	}
 
@@ -189,7 +196,7 @@ int TICL::get(uint8_t* header, uint8_t* data, int* datalength, int maxlength***R
 	// Check if this is a data-free message
 	if (*datalength > maxlength***REMOVED*** {
 		if (serial_***REMOVED*** {
-			serial_->print("Message overflowing buffer: "***REMOVED***;
+			serial_->print("Msg buf ovfl: "***REMOVED***;
 			serial_->print(*datalength***REMOVED***;
 			serial_->print(" > "***REMOVED***;
 			serial_->println(maxlength***REMOVED***;
