@@ -24,14 +24,54 @@ CBL2::CBL2(int tip, int ring***REMOVED*** :
 }
 
 int CBL2::getFromCBL2(uint8_t type, uint8_t* header, uint8_t* data, int* datalength, int maxlength***REMOVED*** {
+	uint8_t msg_header[4];
+	uint8_t endpoint = (type == 0x01***REMOVED***?CALC85b:CALC82;	// CALC82 for strings and other types, CALC85b for lists
+	int length;
+	
 	// Step 1: Send REQ, wait for ACK and VAR
+	// We will assume that the CBL2 can use 11-byte (TI-82/TI-83/TI-85-style***REMOVED***
+	// variable headers when we send messages with a CALC82 endpoint
+	msg_header[0] = endpoint;
+	msg_header[1] = REQ;
+	msg_header[2] = 11;
+	msg_header[3] = 0;
+	send(msg_header, header, 11***REMOVED***;
 	
+	if (get(msg_header, NULL, &length, 0***REMOVED*** || msg_header[1] != ACK***REMOVED*** {
+		// Either the message was not an ACK, or we didn't even get a message
+		return -1;
+	}
+	
+	if (get(msg_header, header, &length, 11***REMOVED*** || msg_header[1] != VAR***REMOVED*** {
+		// Either the message was not a VAR, or we didn't even get a message
+		return -1;
+	}
+
 	// Step 2: ACK VAR, send CTS
+	msg_header[0] = endpoint;
+	msg_header[1] = ACK;
+	msg_header[2] = msg_header[3] = 0;
+	send(msg_header, NULL, 0***REMOVED***;
 	
+	msg_header[1] = CTS;
+	send(msg_header, NULL, 0***REMOVED***;
+
 	// Step 3: Receive CTS ACK and DATA
+	if (get(msg_header, NULL, &length, 0***REMOVED*** || msg_header[1] != ACK***REMOVED*** {
+		// Either the message was not an ACK, or we didn't even get a message
+		return -1;
+	}
+
+	if (get(msg_header, NULL, datalength, maxlength***REMOVED*** || msg_header[1] != DATA***REMOVED*** {
+		// Either the message was not a DATA, or we didn't even get a message
+		return -1;
+	}
 	
 	// Step 4: ACK DATA (do NOT perform EOT***REMOVED***
-	return -1;
+	msg_header[0] = endpoint;
+	msg_header[1] = ACK;
+	msg_header[2] = msg_header[3] = 0;
+	return send(msg_header, NULL, 0***REMOVED***;
 }
 
 int CBL2::sendToCBL2(uint8_t type, uint8_t* header, uint8_t* data, int datalength***REMOVED*** {
