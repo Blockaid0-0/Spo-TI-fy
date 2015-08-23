@@ -15,9 +15,10 @@ double TIVar::realToFloat8x(uint8_t* real, enum Endpoint model***REMOVED*** {
 	
 	// Figure out what type it is
 	enum RealType type = modelToType(model***REMOVED***;
-	if (type == REAL_89***REMOVED***
+	if (type == REAL_89***REMOVED*** {
 		return NAN;			// TI-89/TI-92 not yet implemented! TODO
-    
+    }
+
 	// Convert the exponent
 	if (type == REAL_82***REMOVED*** {
 		dec_exp = ((int16_t***REMOVED***real[1] - 0x80***REMOVED*** - 13;		// decimal point is followed by 13 digits
@@ -111,9 +112,10 @@ int TIVar::floatToReal8x(double f, uint8_t* real, enum Endpoint model***REMOVED*
 	
 	// Figure out what type it is
 	enum RealType type = modelToType(model***REMOVED***;
-	if (type == REAL_89***REMOVED***
+	if (type == REAL_89***REMOVED*** {
 		return -1;			// TI-89/TI-92 not yet implemented! TODO
-    
+    }
+
 	// Set sign bit and get absolute value
 	real[0] = (f >= 0***REMOVED***?0x00:0x80;
 	f = (f > 0***REMOVED***?f:-f;

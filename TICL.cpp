@@ -54,8 +54,9 @@ int TICL::send(uint8_t* header, uint8_t* data, int datalength, uint8_t(*data_cal
 	// Send all of the bytes in the header
 	for(int idx = 0; idx < 4; idx++***REMOVED*** {
 		int rval = sendByte(header[idx]***REMOVED***;
-		if (rval != 0***REMOVED***
+		if (rval != 0***REMOVED*** {
 			return rval;
+		}
 	}
 	
 	// If no data, we're done
@@ -89,15 +90,17 @@ int TICL::send(uint8_t* header, uint8_t* data, int datalength, uint8_t(*data_cal
 		}
 		// Try to send this byte
 		int rval = sendByte(outbyte***REMOVED***;
-		if (rval != 0***REMOVED***
+		if (rval != 0***REMOVED*** {
 			return rval;
+		}
 		checksum += outbyte;
 	}
 	
 	// Send the checksum
 	int rval = sendByte(checksum & 0x00ff***REMOVED***;
-	if (rval != 0***REMOVED***
+	if (rval != 0***REMOVED*** {
 		return rval;
+	}
 	rval = sendByte((checksum >> 8***REMOVED*** & 0x00ff***REMOVED***;
 	return rval;
 }
@@ -162,8 +165,9 @@ int TICL::get(uint8_t* header, uint8_t* data, int* datalength, int maxlength***R
 	// Get the 4-byte header: sender, message, length
 	for(int idx = 0; idx < 4; idx++***REMOVED*** {
 		rval = getByte(&header[idx]***REMOVED***;
-		if (rval***REMOVED***
+		if (rval***REMOVED*** {
 			return rval;
+		}
 	}
 	*datalength = (int***REMOVED***header[2] | ((int***REMOVED***header[3] << 8***REMOVED***;
 	
@@ -176,8 +180,9 @@ int TICL::get(uint8_t* header, uint8_t* data, int* datalength, int maxlength***R
 		serial_->println(*datalength***REMOVED***;
 	}
 
-	if (*datalength == 0***REMOVED***
+	if (*datalength == 0***REMOVED*** {
 		return 0;
+	}
 
 	// These  also indicate that there are 
 	// no data bytes to be received
@@ -210,8 +215,9 @@ int TICL::get(uint8_t* header, uint8_t* data, int* datalength, int maxlength***R
 		// Try to get all the bytes, or fail if any of the
 		// individual byte reads fail
 		rval = getByte(&data[idx]***REMOVED***;
-		if (rval != 0***REMOVED***
+		if (rval != 0***REMOVED*** {
 			return rval;
+		}
 			
 		// Update checksum
 		checksum += data[idx];
@@ -226,8 +232,11 @@ int TICL::get(uint8_t* header, uint8_t* data, int* datalength, int maxlength***R
 	}
 	
 	// Die on a bad checksum
-	if (checksum != (uint16_t***REMOVED***(((int***REMOVED***recv_checksum[1] << 8***REMOVED*** | (int***REMOVED***recv_checksum[0]***REMOVED******REMOVED***
+	if (checksum !=
+	   (uint16_t***REMOVED***(((int***REMOVED***recv_checksum[1] << 8***REMOVED*** | (int***REMOVED***recv_checksum[0]***REMOVED******REMOVED***
+	{
 		return ERR_BAD_CHECKSUM;
+	}
 	
 	return 0;
 }
@@ -263,7 +272,9 @@ int TICL::getByte(uint8_t* byte***REMOVED*** {
 		while (digitalRead(line***REMOVED*** == LOW***REMOVED*** {            //wait for the other one to go high again
 			if (micros(***REMOVED*** - previousMicros > TIMEOUT***REMOVED*** {
 				resetLines(***REMOVED***;
-				if (serial_***REMOVED*** { serial_->print("died waiting for bit ack "***REMOVED***; serial_->println(bit***REMOVED***; }
+				if (serial_***REMOVED*** {
+					serial_->print("died waiting for bit ack "***REMOVED***; serial_->println(bit***REMOVED***;
+				}
 				return ERR_READ_TIMEOUT;
 			}
 		}
@@ -271,7 +282,10 @@ int TICL::getByte(uint8_t* byte***REMOVED*** {
 		// Now set them both high and to input
 		resetLines(***REMOVED***;
 	}
-	if (serial_***REMOVED*** { serial_->print("Got byte "***REMOVED***; serial_->println(*byte***REMOVED***; }
+	if (serial_***REMOVED*** {
+		serial_->print("Got byte "***REMOVED***;
+		serial_->println(*byte***REMOVED***;
+	}
 	return 0;
 }
 
