@@ -105,15 +105,15 @@ int TICL::send(uint8_t* header, uint8_t* data, int datalength, uint8_t(*data_cal
 // Send a single byte from the Arduino to the attached
 // TI device, returning nonzero if a failure occurred.
 int TICL::sendByte(uint8_t byte***REMOVED*** {
-	long previousMillis = 0;
+	unsigned long previousMicros = 0;
 
 	// Send all of the bits in this byte
 	for(int bit = 0; bit < 8; bit++***REMOVED*** {
 		
 		// Wait for both lines to be high before sending the bit
-		previousMillis = 0;
+		previousMicros = micros(***REMOVED***;
 		while (digitalRead(ring_***REMOVED*** == LOW || digitalRead(tip_***REMOVED*** == LOW***REMOVED*** {
-			if (previousMillis++ > TIMEOUT***REMOVED*** {
+			if (micros(***REMOVED*** - previousMicros > TIMEOUT***REMOVED*** {
 				resetLines(***REMOVED***;
 				return ERR_WRITE_TIMEOUT;
 			}
@@ -127,9 +127,9 @@ int TICL::sendByte(uint8_t byte***REMOVED*** {
 		
 		// Wait for peer to acknowledge by pulling opposite line low
 		line = (bitval***REMOVED***?tip_:ring_;
-		previousMillis = 0;
+		previousMicros = micros(***REMOVED***;
 		while (digitalRead(line***REMOVED*** == HIGH***REMOVED*** {
-			if (previousMillis++ > TIMEOUT***REMOVED*** {
+			if (micros(***REMOVED*** - previousMicros > TIMEOUT***REMOVED*** {
 				resetLines(***REMOVED***;
 				return ERR_WRITE_TIMEOUT;
 			}
@@ -137,9 +137,9 @@ int TICL::sendByte(uint8_t byte***REMOVED*** {
 
 		// Wait for peer to indicate readiness by releasing that line
 		resetLines(***REMOVED***;
-		previousMillis = 0;
+		previousMicros = micros(***REMOVED***;
 		while (digitalRead(line***REMOVED*** == LOW***REMOVED*** {
-			if (previousMillis++ > TIMEOUT***REMOVED*** {
+			if (micros(***REMOVED*** - previousMicros > TIMEOUT***REMOVED*** {
 				resetLines(***REMOVED***;
 				return ERR_WRITE_TIMEOUT;
 			}
@@ -235,18 +235,19 @@ int TICL::get(uint8_t* header, uint8_t* data, int* datalength, int maxlength***R
 // Receive a single byte from the attached TI device,
 // returning nonzero if a failure occurred.
 int TICL::getByte(uint8_t* byte***REMOVED*** {
-	long previousMillis = 0;
+	unsigned long previousMicros = 0;
 	*byte = 0;
 	
 	// Pull down each bit and store it
 	for (int bit = 0; bit < 8; bit++***REMOVED*** {
 		int linevals;
 
-		previousMillis = 0;
+		previousMicros = 0;
 		while ((linevals = ((digitalRead(ring_***REMOVED*** << 1***REMOVED*** | digitalRead(tip_***REMOVED******REMOVED******REMOVED*** == 0x03***REMOVED*** {
-			if (previousMillis++ > GET_ENTER_TIMEOUT***REMOVED*** {
+			if (micros(***REMOVED*** - previousMicros > GET_ENTER_TIMEOUT***REMOVED*** {
 				resetLines(***REMOVED***;
-				return ERR_READ_TIMEOUT;
+				if (serial_***REMOVED*** { serial_->print("died waiting for bit "***REMOVED***; serial_->println(bit***REMOVED***; }
+				return ERR_READ_ENTER_TIMEOUT;
 			}
 		}
 		
@@ -258,10 +259,11 @@ int TICL::getByte(uint8_t* byte***REMOVED*** {
 		
 		// Wait for the peer to indicate readiness
 		line = (linevals == 0x01***REMOVED***?ring_:tip_;		
-		previousMillis = 0;
-		while (digitalRead(line***REMOVED*** == LOW***REMOVED*** {            //wait for the other one to go low
-			if (previousMillis++ > TIMEOUT***REMOVED*** {
+		previousMicros = 0;
+		while (digitalRead(line***REMOVED*** == LOW***REMOVED*** {            //wait for the other one to go high again
+			if (micros(***REMOVED*** - previousMicros > TIMEOUT***REMOVED*** {
 				resetLines(***REMOVED***;
+				if (serial_***REMOVED*** { serial_->print("died waiting for bit ack "***REMOVED***; serial_->println(bit***REMOVED***; }
 				return ERR_READ_TIMEOUT;
 			}
 		}
@@ -269,12 +271,11 @@ int TICL::getByte(uint8_t* byte***REMOVED*** {
 		// Now set them both high and to input
 		resetLines(***REMOVED***;
 	}
+	if (serial_***REMOVED*** { serial_->print("Got byte "***REMOVED***; serial_->println(*byte***REMOVED***; }
 	return 0;
 }
 
 void TICL::resetLines(void***REMOVED*** {
-	pinMode(ring_, INPUT***REMOVED***;           // set pin to input
-	digitalWrite(ring_, HIGH***REMOVED***;       // turn on pullup resistors
-	pinMode(tip_, INPUT***REMOVED***;            // set pin to input
-	digitalWrite(tip_, HIGH***REMOVED***;        // turn on pullup resistors
+	pinMode(ring_, INPUT_PULLUP***REMOVED***;           // set pin to input with pullups
+	pinMode(tip_, INPUT_PULLUP***REMOVED***;            // set pin to input with pullups
 }
