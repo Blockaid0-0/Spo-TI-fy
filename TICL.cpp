@@ -109,6 +109,10 @@ int TICL::send(uint8_t* header, uint8_t* data, int datalength, uint8_t(*data_cal
 // TI device, returning nonzero if a failure occurred.
 int TICL::sendByte(uint8_t byte***REMOVED*** {
 	unsigned long previousMicros;
+	if (serial_***REMOVED*** {
+		serial_->print("Sending byte "***REMOVED***;
+		serial_->println(byte***REMOVED***;
+	}
 
 	// Send all of the bits in this byte
 	for(int bit = 0; bit < 8; bit++***REMOVED*** {
@@ -147,12 +151,12 @@ int TICL::sendByte(uint8_t byte***REMOVED*** {
 				return ERR_WRITE_TIMEOUT;
 			}
 		}
+		resetLines(***REMOVED***;
 		
 		// Rotate the next bit to send into the low bit of the byte
 		byte >>= 1;
 	}
-	
-	resetLines(***REMOVED***;
+
 	return 0;
 }
 
