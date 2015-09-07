@@ -67,17 +67,17 @@ int onSendAsCBL2(uint8_t type, enum Endpoint model, int* headerlen,
   Serial.print(" from endpoint of type "***REMOVED***;
   Serial.println((int***REMOVED***model***REMOVED***;
   
-  if (type != 0x01***REMOVED***
+  if (type != VarTypes82::VarRList***REMOVED***
     return -1;
   
   // Compose the VAR header
   *datalen = 2 + TIVar::sizeOfReal(model***REMOVED*** * ANALOG_PIN_COUNT;
   TIVar::intToSizeWord(*datalen, &header[0]***REMOVED***;	// Two bytes for the element count, ANALOG_PIN_COUNT Reals
                                                 // This sets header[0] and header[1]
-  header[2] = 0x04;				// RealList (if you're a TI-85. Bleh.***REMOVED***
-  header[3] = 0x01;				// Name length
-  header[4] = 0x41;				// "A", as per "standard" See http://www.cemetech.net/forum/viewtopic.php?p=224739#224739
-  header[5] = 0x00;				// Zero terminator (remainder of header is ignored***REMOVED***
+  header[2] = VarTypes85::VarRList;             // RealList (if you're a TI-85. Bleh.***REMOVED***
+  header[3] = 0x01;	               // Name length
+  header[4] = 0x41;                // "A", as per "standard" See http://www.cemetech.net/forum/viewtopic.php?p=224739#224739
+  header[5] = 0x00;                // Zero terminator (remainder of header is ignored***REMOVED***
   *headerlen = 11;
   
   // Compose the body of the variable
