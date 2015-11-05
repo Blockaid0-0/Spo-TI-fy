@@ -78,7 +78,7 @@ class TICL {
 		void setVerbosity(bool verbose, HardwareSerial* serial = NULL***REMOVED***;
 
 		int send(uint8_t* header, uint8_t* data, int datalength, uint8_t(*data_callback***REMOVED***(int***REMOVED*** = NULL***REMOVED***;
-		int get(uint8_t* header, uint8_t* data, int* datalength, int maxlength***REMOVED***;
+		int get(uint8_t* header, uint8_t* data, int* datalength, int maxlength, int timeout = GET_ENTER_TIMEOUT***REMOVED***;
 		void resetLines(***REMOVED***;
 
 	protected:
@@ -86,7 +86,7 @@ class TICL {
 
 	private:
 		int sendByte(uint8_t byte***REMOVED***;
-		int getByte(uint8_t* byte***REMOVED***;
+		int getByte(uint8_t* byte, int timeout = GET_ENTER_TIMEOUT***REMOVED***;
 		int digitalSafeRead(int pin***REMOVED***;
 
 		int tip_;

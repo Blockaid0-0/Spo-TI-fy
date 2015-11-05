@@ -164,12 +164,14 @@ int TICL::sendByte(uint8_t byte***REMOVED*** {
 // for failure. If return value is 0 and datalength is zero,
 // then the message is just a 4-byte message in the header
 // buffer. If the 
-int TICL::get(uint8_t* header, uint8_t* data, int* datalength, int maxlength***REMOVED*** {
+int TICL::get(uint8_t* header, uint8_t* data, int* datalength,
+              int maxlength, int timeout***REMOVED***
+{
 	int rval;
 
 	// Get the 4-byte header: sender, message, length
 	for(int idx = 0; idx < 4; idx++***REMOVED*** {
-		rval = getByte(&header[idx]***REMOVED***;
+		rval = getByte(&header[idx], timeout***REMOVED***;
 		if (rval***REMOVED*** {
 			return rval;
 		}
@@ -248,7 +250,7 @@ int TICL::get(uint8_t* header, uint8_t* data, int* datalength, int maxlength***R
 
 // Receive a single byte from the attached TI device,
 // returning nonzero if a failure occurred.
-int TICL::getByte(uint8_t* byte***REMOVED*** {
+int TICL::getByte(uint8_t* byte, int timeout***REMOVED*** {
 	unsigned long previousMicros = 0;
 	*byte = 0;
 	
@@ -258,7 +260,7 @@ int TICL::getByte(uint8_t* byte***REMOVED*** {
 
 		previousMicros = micros(***REMOVED***;
 		while ((linevals = ((digitalRead(ring_***REMOVED*** << 1***REMOVED*** | digitalRead(tip_***REMOVED******REMOVED******REMOVED*** == 0x03***REMOVED*** {
-			if (micros(***REMOVED*** - previousMicros > GET_ENTER_TIMEOUT***REMOVED*** {
+			if (micros(***REMOVED*** - previousMicros > timeout***REMOVED*** {
 				resetLines(***REMOVED***;
 				if (serial_***REMOVED*** {
 					serial_->print("died waiting for bit "***REMOVED***; serial_->println(bit***REMOVED***;

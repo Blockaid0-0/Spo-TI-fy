@@ -151,7 +151,7 @@ int CBL2::setupCallbacks(uint8_t* header, uint8_t* data, int maxlength,
 	return 0;
 }
 
-int CBL2::eventLoopTick(***REMOVED*** {
+int CBL2::eventLoopTick(bool quick_fail***REMOVED*** {
 	uint8_t msg_header[4];
 	int length;
 	int rval;
@@ -162,7 +162,7 @@ int CBL2::eventLoopTick(***REMOVED*** {
 	}
 	
 	// See if there's a message coming
-	rval = get(msg_header, data_, &length, maxlength_***REMOVED***;
+	rval = get(msg_header, data_, &length, maxlength_, quick_fail ? TIMEOUT : GET_ENTER_TIMEOUT***REMOVED***;
 	if (rval***REMOVED*** {
 		if (serial_***REMOVED*** {
 			serial_->print("No msg: code "***REMOVED***;

@@ -55,7 +55,7 @@ class CBL2: public TICL {
 		int setupCallbacks(uint8_t* header, uint8_t* data, int maxlength,
 		                   int (*get_callback***REMOVED***(uint8_t, enum Endpoint, int***REMOVED***,
 						   int (*send_callback***REMOVED***(uint8_t, enum Endpoint, int*, int*, data_callback****REMOVED******REMOVED***;
-		int eventLoopTick(***REMOVED***;						// Usually called in loop(***REMOVED***
+		int eventLoopTick(bool quick_fail = false***REMOVED***;				// Usually called in loop(***REMOVED***
 
 	private:
 		bool verbose_;
