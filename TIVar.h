@@ -21,6 +21,7 @@ enum RealType {
 
 class TIVar {
   public:
+	static long long int realToLong8x(uint8_t* real, enum Endpoint model***REMOVED***;
 	static double realToFloat8x(uint8_t* real, enum Endpoint model = CBL82***REMOVED***;
 	static int longToReal8x(long long int n, uint8_t* real, enum Endpoint model = CBL85***REMOVED***;
 	static int floatToReal8x(double f, uint8_t* real, enum Endpoint model = CBL85***REMOVED***;
@@ -29,5 +30,6 @@ class TIVar {
 	static int sizeOfReal(enum Endpoint model***REMOVED***;
 
   private:
+	static int32_t extractExponent(uint8_t* real, enum RealType type***REMOVED***;
 	static RealType modelToType(enum Endpoint model***REMOVED***;
 };

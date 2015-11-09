@@ -8,6 +8,36 @@
 
 #include "TIVar.h"
 
+// Convert a TI real variable into a long long int
+long long int TIVar::realToLong8x(uint8_t* real, enum Endpoint model***REMOVED*** {
+	long long int rval = 0;
+    int32_t dec_exp;
+	
+	// Figure out what type it is
+	enum RealType type = modelToType(model***REMOVED***;
+	if (type == REAL_89***REMOVED*** {
+		return NAN;			// TI-89/TI-92 not yet implemented! TODO
+    }
+
+	// Convert the exponent
+	dec_exp = TIVar::extractExponent(real, type***REMOVED*** + 14;
+	
+	// Now extract the number
+	const uint8_t mantissa_offset = (type == REAL_82***REMOVED***?2:3;
+	for(int i = 0; i < dec_exp; i++***REMOVED*** {
+		rval *= 10;
+		rval += 0x0f & (real[mantissa_offset + (i >> 1***REMOVED***] >> (4 - (4 * (i % 2***REMOVED******REMOVED******REMOVED******REMOVED***;
+	}
+	
+	// Negate the number, if necessary
+	if (real[0] & 0x80***REMOVED*** {
+		rval = 0 - rval;
+	}
+	
+	return rval;
+}
+
+// Convert a TI real variable into a double
 double TIVar::realToFloat8x(uint8_t* real, enum Endpoint model***REMOVED*** {
     const double ieee_lut[10] = {0.f, 1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f, 9.f};
     int32_t dec_exp;
@@ -20,13 +50,7 @@ double TIVar::realToFloat8x(uint8_t* real, enum Endpoint model***REMOVED*** {
     }
 
 	// Convert the exponent
-	if (type == REAL_82***REMOVED*** {
-		dec_exp = ((int16_t***REMOVED***real[1] - 0x80***REMOVED*** - 13;		// decimal point is followed by 13 digits
-	} else if (type == REAL_85***REMOVED*** {
-		int32_t raw_exp = (int32_t***REMOVED***TIVar::sizeWordToInt(&real[1]***REMOVED***;
-		raw_exp -= 0x00fc00;
-		dec_exp = (int16_t***REMOVED***raw_exp;
-	}
+	dec_exp = TIVar::extractExponent(real, type***REMOVED***;
 
 	// Convert the mantissa
 	const uint8_t mantissa_offset = (type == REAL_82***REMOVED***?2:3;
@@ -55,6 +79,7 @@ double TIVar::realToFloat8x(uint8_t* real, enum Endpoint model***REMOVED*** {
 	return ieee_acc;
 }
 
+// Convert a long long signed integer into a TI real variable
 int TIVar::longToReal8x(long long int n, uint8_t* real, enum Endpoint model***REMOVED*** {
 	int16_t exp = 13;
 
@@ -107,6 +132,7 @@ int TIVar::longToReal8x(long long int n, uint8_t* real, enum Endpoint model***RE
 	return TIVar::sizeOfReal(model***REMOVED***;		// Success: inserted data length
 }
 
+// Convert a double into a TI real variable
 int TIVar::floatToReal8x(double f, uint8_t* real, enum Endpoint model***REMOVED*** {
 	int16_t exp = 13;
 	
@@ -152,7 +178,6 @@ int TIVar::floatToReal8x(double f, uint8_t* real, enum Endpoint model***REMOVED*
 	}
 	
 	// Set the exponent
-	// Set the exponent
 	if (type == REAL_82***REMOVED*** {
 		exp += 0x80;
 		real[1] = (uint8_t***REMOVED***exp;
@@ -167,6 +192,7 @@ int TIVar::floatToReal8x(double f, uint8_t* real, enum Endpoint model***REMOVED*
 	return TIVar::sizeOfReal(model***REMOVED***;		// Success: inserted data length
 }
 
+// Return the type of real variable used on each model
 enum RealType TIVar::modelToType(enum Endpoint model***REMOVED*** {
 	switch(model***REMOVED*** {
 		case COMP82:
@@ -200,6 +226,17 @@ enum RealType TIVar::modelToType(enum Endpoint model***REMOVED*** {
 	}
 }
 
+// Extract the exponent from a real
+int32_t TIVar::extractExponent(uint8_t* real, enum RealType type***REMOVED*** {
+	if (type == REAL_82***REMOVED*** {
+		return ((int16_t***REMOVED***real[1] - 0x80***REMOVED*** - 13;		// decimal point is followed by 13 digits
+	} else if (type == REAL_85***REMOVED*** {
+		int32_t raw_exp = (int32_t***REMOVED***TIVar::sizeWordToInt(&real[1]***REMOVED***;
+		raw_exp -= 0x00fc00;
+		return (int16_t***REMOVED***raw_exp;
+	}
+}
+
 uint16_t TIVar::sizeWordToInt(uint8_t* ptr***REMOVED*** {
 	return ((uint16_t***REMOVED***ptr[0]***REMOVED*** | (((uint16_t***REMOVED***ptr[1]***REMOVED*** << 8***REMOVED***;
 }
@@ -210,6 +247,8 @@ void TIVar::intToSizeWord(uint16_t size, uint8_t* ptr***REMOVED*** {
 	return;
 }
 
+// Real variable length on each model
+// REAL_89 is currently not supported by ArTICL.
 int TIVar::sizeOfReal(enum Endpoint model***REMOVED*** {
 	enum RealType type = modelToType(model***REMOVED***;
 	switch(type***REMOVED*** {
