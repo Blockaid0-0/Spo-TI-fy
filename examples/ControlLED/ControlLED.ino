@@ -20,7 +20,7 @@
 #include "CBL2.h"
 #include "TIVar.h"
 
-CBL2* cbl;
+CBL2 cbl;
 const int lineRed = DEFAULT_TIP;
 const int lineWhite = DEFAULT_RING;
 
@@ -53,13 +53,13 @@ void setup(***REMOVED*** {
   }
 
   Serial.begin(9600***REMOVED***;                           // Used for debugging
-  cbl = new CBL2(lineRed, lineWhite***REMOVED***;
-  cbl->resetLines(***REMOVED***;
-  // cbl->setVerbosity(true, &Serial***REMOVED***;			// Comment this in for verbose message information
+  cbl.setLines(lineRed, lineWhite***REMOVED***;
+  cbl.resetLines(***REMOVED***;
+  // cbl.setVerbosity(true, &Serial***REMOVED***;			// Comment this in for verbose message information
   
   // The following registers buffers for exchanging data, the maximum
   // allowed data length, and functions to call on Get(***REMOVED*** and Send(***REMOVED***.
-  cbl->setupCallbacks(header, data, MAXDATALEN,
+  cbl.setupCallbacks(header, data, MAXDATALEN,
                       onGetAsCBL2, onSendAsCBL2***REMOVED***;
 }
 
@@ -69,7 +69,7 @@ void setup(***REMOVED*** {
 // setup(***REMOVED*** above.
 void loop(***REMOVED*** {
   int rval;
-  rval = cbl->eventLoopTick(***REMOVED***;
+  rval = cbl.eventLoopTick(***REMOVED***;
   if (rval && rval != ERR_READ_TIMEOUT***REMOVED*** {
     Serial.print("Failed to run eventLoopTick: code "***REMOVED***;
     Serial.println(rval***REMOVED***;
