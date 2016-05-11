@@ -33,6 +33,11 @@ const int analogPins[ANALOG_PIN_COUNT] = {0, 1, 2, 3, 4, 5};
 
 #endif
 
+// Forward function definitions.
+int onGetAsCBL2(uint8_t type, enum Endpoint model, int datalen***REMOVED***;
+int onSendAsCBL2(uint8_t type, enum Endpoint model, int* headerlen,
+                 int* datalen, data_callback* data_callback***REMOVED***;
+
 void setup(***REMOVED*** {
   Serial.begin(9600***REMOVED***;
   cbl.setLines(lineRed, lineWhite***REMOVED***;
