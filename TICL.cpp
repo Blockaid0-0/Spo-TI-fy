@@ -18,7 +18,7 @@ TICL::TICL(***REMOVED*** {
 // fact: You can use this and multiple TICL objects to
 // talk to multiple endpoints at the same time.
 TICL::TICL(int tip, int ring***REMOVED*** {
-	setLines(tip_, ring_***REMOVED***;
+	setLines(tip, ring***REMOVED***;
 	serial_ = NULL;
 }
 
