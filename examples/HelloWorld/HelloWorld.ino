@@ -44,7 +44,8 @@ int onReceived(uint8_t type, enum Endpoint model, int datalen***REMOVED*** {
     }
 
     String str = TIVar::strVarToString8x(data, model***REMOVED***;
-    Serial.println("Received: " + str***REMOVED***;
+    Serial.print("Received: "***REMOVED***;
+	Serial.println(str.c_str(***REMOVED******REMOVED***;
     return 0;
 }
 
@@ -66,8 +67,8 @@ int onRequest(uint8_t type, enum Endpoint model, int* headerlen,
     memset(header, 0, sizeof(header***REMOVED******REMOVED***;
     TIVar::intToSizeWord(rval, header***REMOVED***;
     header[2] = VarTypes82::VarString; // Variable type
-    header[3] = 0xAA; // Variable name (Str1***REMOVED***
-    header[4] = 0x00; // ^
+    header[3] = 0xAA; // Variable name (tVarStr***REMOVED***
+    header[4] = 0x00; // ^ (tStr1***REMOVED***
     *headerlen = 13;
 
     Serial.println("Sending: " + hello***REMOVED***;
