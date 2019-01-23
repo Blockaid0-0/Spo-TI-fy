@@ -3,7 +3,7 @@
  *           or CBL-connected calculators with   *
  *           Arduinos.                           *
  *           Created by Christopher Mitchell,    *
- *           2011-2015, all rights reserved.     *
+ *           2011-2019, all rights reserved.     *
  *************************************************/
 
 #include "Arduino.h"
@@ -174,7 +174,6 @@ int CBL2::eventLoopTick(bool quick_fail***REMOVED*** {
 	// Deduce what kind of operation is happening
 	// CBL2 responds to TI-82 as 0x12, "0x95" endpoint as 0x15
 	enum Endpoint model = (enum Endpoint***REMOVED***msg_header[0];
-	bool type_as_cbl = true;
 	switch(model***REMOVED*** {
 		case CALC82:
 			endpoint = CBL82;
@@ -187,11 +186,9 @@ int CBL2::eventLoopTick(bool quick_fail***REMOVED*** {
 			endpoint = CBL89;
 			break;
 		case COMP83:
-			//type_as_cbl = false;
 			endpoint = CALC83;
 			break;
 		case COMP83P:
-			type_as_cbl = false;
 			endpoint = CALC83P;
 			break;
 		default:
@@ -236,7 +233,8 @@ int CBL2::eventLoopTick(bool quick_fail***REMOVED*** {
 			}
 			
 			// Deliver the data to the callback
-			rval = get_callback_(header_[3], model, length***REMOVED***;	// Ignore rval for now	
+			normalizeVariableHeader(model***REMOVED***;			// Deal with all the wacky way headers can be constructed
+			rval = get_callback_(header_[2], model, length***REMOVED***;	// Ignore rval for now	
 			break;
 	
 		case EOT:
@@ -263,8 +261,15 @@ int CBL2::eventLoopTick(bool quick_fail***REMOVED*** {
 			// Get the header and data from the callback
 			data_callback_ = NULL;
 			int headerlength = length;
-			send_callback_(header_[type_as_cbl ? 3 : 2], model,
+			uint8_t tmp_header[16];
+			memcpy(tmp_header, header_, 16***REMOVED***;		// Save it...
+			normalizeVariableHeader(model***REMOVED***;			// Deal with all the wacky way headers can be constructed
+			send_callback_(header_[2], model,
 			               &headerlength, &datalength_, &data_callback_***REMOVED***;
+			// Copy in the size.
+			tmp_header[0] = header_[0];
+			tmp_header[1] = header_[1];
+			memcpy(header_, tmp_header, 16***REMOVED***;		// ...and restore it
 			
 			// Send the VAR message
 			msg_header[0] = endpoint;
@@ -297,4 +302,13 @@ int CBL2::eventLoopTick(bool quick_fail***REMOVED*** {
 	}
 
 	return rval;
+}
+
+void CBL2::normalizeVariableHeader(const int model***REMOVED*** {
+	if ((model == CALC82 || model == CALC85b***REMOVED*** && header_[2] == VarTypes82::VarString && header_[3] == VarTypes82::VarRList***REMOVED*** {
+		// Real list from "TI-82" (could be TI-84+SE or TI-84+CSE , variable name encoded with some odd format
+		header_[2] = VarTypes82::VarRList;
+	} else if (model == CALC82 && header_[2] == VarTypes82::VarReal && header_[3] == 0xAA /* tVarStr */***REMOVED*** {
+		header_[2] = VarTypes82::VarString;
+	}
 }
