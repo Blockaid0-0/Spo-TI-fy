@@ -12,7 +12,7 @@
 long long int TIVar::realToLong8x(uint8_t* real, enum Endpoint model***REMOVED*** {
 	long long int rval = 0;
     int32_t dec_exp;
-	
+
 	// Figure out what type it is
 	enum RealType type = modelToType(model***REMOVED***;
 	if (type == REAL_89***REMOVED*** {
@@ -21,19 +21,19 @@ long long int TIVar::realToLong8x(uint8_t* real, enum Endpoint model***REMOVED**
 
 	// Convert the exponent
 	dec_exp = TIVar::extractExponent(real, type***REMOVED*** + 14;
-	
+
 	// Now extract the number
 	const uint8_t mantissa_offset = (type == REAL_82***REMOVED***?2:3;
 	for(int i = 0; i < dec_exp; i++***REMOVED*** {
 		rval *= 10;
 		rval += 0x0f & (real[mantissa_offset + (i >> 1***REMOVED***] >> (4 - (4 * (i % 2***REMOVED******REMOVED******REMOVED******REMOVED***;
 	}
-	
+
 	// Negate the number, if necessary
 	if (real[0] & 0x80***REMOVED*** {
 		rval = 0 - rval;
 	}
-	
+
 	return rval;
 }
 
@@ -42,7 +42,7 @@ double TIVar::realToFloat8x(uint8_t* real, enum Endpoint model***REMOVED*** {
     const double ieee_lut[10] = {0.f, 1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f, 9.f};
     int32_t dec_exp;
 	double ieee_acc = 0;
-	
+
 	// Figure out what type it is
 	enum RealType type = modelToType(model***REMOVED***;
 	if (type == REAL_89***REMOVED*** {
@@ -58,24 +58,24 @@ double TIVar::realToFloat8x(uint8_t* real, enum Endpoint model***REMOVED*** {
 		float digit = ieee_lut[0x0f & (real[mantissa_offset + (i >> 1***REMOVED***] >> ((i & 0x01***REMOVED***?0:4***REMOVED******REMOVED***];
 		ieee_acc = (10 * ieee_acc***REMOVED*** + digit;
 	}
-	
+
 	// Raise mantissa to a positive exponent
 	while(dec_exp > 0***REMOVED*** {
 		ieee_acc *= 10;
 		dec_exp--;
 	}
-	
+
 	// Lower mantissa to a negative exponent
 	while(dec_exp < 0***REMOVED*** {
 		ieee_acc *= 0.1f;
 		dec_exp++;
 	}
-	
+
 	// Negate the number, if necessary
 	if (real[0] & 0x80***REMOVED*** {
 		ieee_acc *= -1;
 	}
-	
+
 	return ieee_acc;
 }
 
@@ -87,17 +87,17 @@ int TIVar::longToReal8x(long long int n, uint8_t* real, enum Endpoint model***RE
 	enum RealType type = modelToType(model***REMOVED***;
 	if (type == REAL_89***REMOVED***
 		return -1;			// TI-89/TI-92 not yet implemented! TODO
-    
+
 	// Set sign bit and get absolute value
 	real[0] = (n >= 0***REMOVED***?0x00:0x80;
 	n = (n > 0***REMOVED***?n:-n;
-	
+
 	// Bring large numbers down
 	while(n != 0 && n >= 10e13***REMOVED*** {
 		n /= 10;
 		exp += 1;
 	}
-	
+
 	// Bring small numbers up
 	while(n != 0 && n < 1e13***REMOVED*** {
 		n *= 10;
@@ -116,7 +116,7 @@ int TIVar::longToReal8x(long long int n, uint8_t* real, enum Endpoint model***RE
 		}
 		n /= 10;
 	}
-	
+
 	// Set the exponent
 	if (type == REAL_82***REMOVED*** {
 		exp += 0x80;
@@ -135,7 +135,7 @@ int TIVar::longToReal8x(long long int n, uint8_t* real, enum Endpoint model***RE
 // Convert a double into a TI real variable
 int TIVar::floatToReal8x(double f, uint8_t* real, enum Endpoint model***REMOVED*** {
 	int16_t exp = 13;
-	
+
 	// Figure out what type it is
 	enum RealType type = modelToType(model***REMOVED***;
 	if (type == REAL_89***REMOVED*** {
@@ -145,19 +145,19 @@ int TIVar::floatToReal8x(double f, uint8_t* real, enum Endpoint model***REMOVED*
 	// Set sign bit and get absolute value
 	real[0] = (f >= 0***REMOVED***?0x00:0x80;
 	f = (f > 0***REMOVED***?f:-f;
-	
+
 	// Bring large numbers down
 	while(f != 0 && f >= 10.e13***REMOVED*** {
 		f *= 0.1f;
 		exp += 1;
 	}
-	
+
 	// Bring small numbers up
 	while(f != 0 && f < 1.e13***REMOVED*** {
 		f *= 10.f;
 		exp -= 1;
 	}
-	
+
 	// Extract the digits
 	const uint8_t mantissa_offset = (type == REAL_82***REMOVED***?2:3;
 	for(int8_t i=13; i >= 0; i--***REMOVED*** {
@@ -168,7 +168,7 @@ int TIVar::floatToReal8x(double f, uint8_t* real, enum Endpoint model***REMOVED*
 			cdigit++;
 			digit -= 1.f;
 		}
-		
+
 		if ((i & 0x01***REMOVED*** == 1***REMOVED*** {
 			real[mantissa_offset + (i >> 1***REMOVED***] = cdigit;
 		} else {
@@ -176,7 +176,7 @@ int TIVar::floatToReal8x(double f, uint8_t* real, enum Endpoint model***REMOVED*
 		}
 		f = (f - odigit***REMOVED*** / 10.f;
 	}
-	
+
 	// Set the exponent
 	if (type == REAL_82***REMOVED*** {
 		exp += 0x80;
@@ -342,7 +342,7 @@ String TIVar::strVarToString8x(uint8_t* strVar, enum Endpoint model***REMOVED***
 
 	uint16_t tokenlen = sizeWordToInt(strVar***REMOVED***;
 	int pos = 2;
-	
+
 	for (int i = 0; i < tokenlen; i++***REMOVED*** {
 		uint8_t c;
 		if (type == STR_85 || type == STR_86***REMOVED*** {
@@ -510,6 +510,7 @@ int32_t TIVar::extractExponent(uint8_t* real, enum RealType type***REMOVED*** {
 		raw_exp -= 0x00fc00;
 		return (int16_t***REMOVED***raw_exp;
 	}
+    return 0;
 }
 
 uint16_t TIVar::sizeWordToInt(uint8_t* ptr***REMOVED*** {
