@@ -1,47 +1,11 @@
-#include "CBL2.h"
-#include "TIVar.h"
+//
+// Created by Blockaid on 8/19/2026.
+//
+#include "include/Globals.h"
+#include "include/Serial.h"
+
+SerialCom ser;
 CBL2 cbl;
-#define MAXDATALEN 255
-
-uint8_t header[16];
-uint8_t data[MAXDATALEN];
-int redLine = 17;
-int whiteLine = 16;
-String mainStr;
-String sendStr[5];
-String mesg[5];
-long long mainNum;
-int strVar = 1;
-
-void serialCommuncation(***REMOVED*** {
-    while (Serial.available(***REMOVED******REMOVED*** {
-        static String majorStr, minorStr[5];
-        char c = Serial.read(***REMOVED***;
-        if (c == '\r'***REMOVED*** continue;
-        if (c != '\n'***REMOVED*** {
-            majorStr += c;
-            continue;
-        }
-        majorStr.trim(***REMOVED***;
-        int count = 0;
-        int start = 0;
-        while (count < 5***REMOVED*** {
-            int commaPos = majorStr.indexOf('|', start***REMOVED***;
-            if (commaPos < 0***REMOVED*** {
-                minorStr[count++] = majorStr.substring(start***REMOVED***;
-                break;
-            }
-            minorStr[count++] = majorStr.substring(start, commaPos***REMOVED***;
-            start = commaPos + 1;
-        }
-        mesg[0] = (count > 0***REMOVED*** ? minorStr[0] : "loading";
-        mesg[1] = (count > 1***REMOVED*** ? minorStr[1] : "loading.";
-        mesg[2] = (count > 2***REMOVED*** ? minorStr[2] : "loading..";
-        mesg[3] = (count > 3***REMOVED*** ? minorStr[3] : "0";
-        mesg[4] = (count > 4***REMOVED*** ? minorStr[4] : "1";
-        majorStr.clear(***REMOVED***;
-    }
-}
 
 int requestStr(uint8_t type, enum Endpoint model, int* headerLen, int* dataLen, data_callback* data_callback***REMOVED*** {
     String text;
@@ -125,6 +89,6 @@ void setup(***REMOVED*** {
     cbl.setupCallbacks(header, data, MAXDATALEN, recieveStr, requestStr***REMOVED***;
 }
 void loop(***REMOVED*** {
-    serialCommuncation(***REMOVED***;
+    SerialCom::serialCommuncation(***REMOVED***;
     cbl.eventLoopTick(***REMOVED***;
 }
