@@ -43,6 +43,7 @@
 build/
 Build/
 build-*/
+exec/
 
 # CMake generated files
 CMakeFiles/
@@ -68,3 +69,4 @@ vcpkg_installed/
 Testing/
 .cache/
 .pio
+.venv
