@@ -15,16 +15,13 @@ sum(7,1,"605040C0C0","Spotify
 Repeat K=45
     getKey->K
     If K=83:Then
-        "PLAY"->Str4
-        Send(Str4
+        Send("PLAY
     End
     If K=84:Then
-        "SKIP"->Str4
-        Send(Str4
+        Send("SKIP
     End
     If K=82:Then
-        "REPLAY"->Str4
-        Send(Str4
+        Send("REPLAY
     End
     Send(Str1
     sum(7,4,4,2,0,Str1
