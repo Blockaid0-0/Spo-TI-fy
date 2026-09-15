@@ -1,6 +1,3 @@
-//
-// Created by Blockaid on 8/19/2026.
-//
 
 #include "include/Serial.h"
 #include "include/Globals.h"
