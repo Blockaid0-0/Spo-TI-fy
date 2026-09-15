@@ -70,3 +70,4 @@ Testing/
 .cache/
 .pio
 .venv
+.cache
