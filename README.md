@@ -33,7 +33,7 @@ Spotify on the TI-84 Plus
 2. #### Open the `platformio.ini` file and wait till it finish setting up the project
 3. #### Connect your ESP32 and upload the program
 > Different microcontroller support will likely be added in the future
-### For the Python script
+### For the Python script 
 1. #### Make sure you have python installed
 2. #### Login to your [Spotify dashboard](https://developer.spotify.com/dashboard) and make an app
 3. #### Take the client ID and Secret and put them in the `CONFIG` file
