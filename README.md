@@ -36,7 +36,7 @@ Spotify on the TI-84 Plus
 ### For the Python script 
 1. #### Make sure you have python installed
 2. #### Login to your [Spotify dashboard](https://developer.spotify.com/dashboard) and make an app
-3. #### Take the client ID and Secret and put them in the `CONFIG` file
+3. #### Take the client ID and Secret and put them in the `exCONFIG` file and rename it to `CONFIG`
 4. #### Add `http://127.0.0.1:8888/callback` to your Redirect URLs
 5. #### Add your ESP32's COM port in the `CONFIG` file
 ### Putting it all together
