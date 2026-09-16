@@ -49,11 +49,11 @@ Start:
    jp Start
 
 mainWindow:
-	.db %01111000
-	.db %01001000
-	.db %01001000
-	.db %01001000
-	.db %11011000
+	.db %00111000
+	.db %00100100
+	.db %00100000
+	.db %01100000
+	.db %01100000
 	.db " Spo(TI)fy",0
 mainWindowE:
 firstText:
