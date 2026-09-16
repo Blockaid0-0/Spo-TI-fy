@@ -3,7 +3,7 @@ import spotipy
 import serial
 from spotipy.oauth2 import SpotifyOAuth
 
-file = open("../../exCONFIG")
+file = open("../../CONFIG")
 content = file.readlines()
 comID = content[1].strip('\n')
 arduino = serial.Serial(port = comID, baudrate=115200, timeout = .1)
