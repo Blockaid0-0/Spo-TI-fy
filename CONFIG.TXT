@@ -1,6 +1,0 @@
-COM Port:
-COM#
-Spotify client ID:
-123abcdewhatever
-Spotify client secret:
-123abcdewhateverbutsecret
