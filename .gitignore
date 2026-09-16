@@ -70,4 +70,5 @@ Testing/
 .cache/
 .pio
 .venv
+.idea
 src/python/.cache
