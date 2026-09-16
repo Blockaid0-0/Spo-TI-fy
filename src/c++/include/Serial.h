@@ -6,5 +6,5 @@
 
 class SerialCom {
 public:
-    static void serialCommuncation(***REMOVED***;
+    static void serialCommuncation();
 };

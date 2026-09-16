@@ -10,22 +10,22 @@
 ;+----------------------------------------+
 
 ;----> Safe Memory Areas
-; saferam1 equ  768 bytes (APDRAM***REMOVED***
-; saferam2 equ  531 bytes (statRAM***REMOVED***
-; saferam3 equ  128 bytes (textMem***REMOVED***
-; saferam4 equ  66 bytes (OpXs***REMOVED***
-; saferam5 equ  10 bytes (iMathPtrs***REMOVED***
+; saferam1 equ  768 bytes (APDRAM)
+; saferam2 equ  531 bytes (statRAM)
+; saferam3 equ  128 bytes (textMem)
+; saferam4 equ  66 bytes (OpXs)
+; saferam5 equ  10 bytes (iMathPtrs)
 
 #DEFINE equ .equ
 #DEFINE EQU .equ
 #DEFINE end .end
 #DEFINE END .end
 
-#define bcallz(xxxx***REMOVED*** b_callz(xxxx***REMOVED***
-#define bcallnz(xxxx***REMOVED*** b_callnz(xxxx***REMOVED***
-#define bcallc(xxxx***REMOVED*** b_callc(xxxx***REMOVED***
-#define bcallnc(xxxx***REMOVED*** b_callnc(xxxx***REMOVED***
-#define bjump(xxxx***REMOVED*** b_jump(xxxx***REMOVED***
+#define bcallz(xxxx) b_callz(xxxx)
+#define bcallnz(xxxx) b_callnz(xxxx)
+#define bcallc(xxxx) b_callc(xxxx)
+#define bcallnc(xxxx) b_callnc(xxxx)
+#define bjump(xxxx) b_jump(xxxx)
 
 SEram		equ $86EC
 saferam1	equ 9872h
@@ -237,17 +237,17 @@ GUIRText					equ $04			;COMPLETE	XY	[x,y,font,z.t. text]
 GUIRWinButtons				equ $05			;COMPLETE	--	[which {-,[],X,00000}, onclick[-] {word}, onclick[] {word}, onclick[X] {word}]
 GUIRWrappedText				equ $06			;COMPLETE	XY	[x,y,width,font,z.t. text]
 GUIRButtonText				equ $07			;COMPLETE	XY	[x,y,onclick {word},zt text]
-GUIRButtonImg				equ $08			;COMPLETE	XY	[x,y,onclick {word},img width [BYTES],button width [PX], img data (5 rows high***REMOVED***]
-GUIRTextLineIn				equ $09			;COMPLETE	XY	[x,y,width,maxchar [word],curdatapos (0 to datalength***REMOVED*** [word],data (z.t.***REMOVED***]
+GUIRButtonImg				equ $08			;COMPLETE	XY	[x,y,onclick {word},img width [BYTES],button width [PX], img data (5 rows high)]
+GUIRTextLineIn				equ $09			;COMPLETE	XY	[x,y,width,maxchar [word],curdatapos (0 to datalength) [word],data (z.t.)]
 GUIRRadio					equ $0A			;COMPLETE	XY	[x,y,group,state {bool},zttext]  1 per group
 GUIRCheckbox				equ $0B			;COMPLETE	XY	[x,y,group,state {bool},zttext] ++ per group
 GUIRByteInt					equ $0C			;COMPLETE	XY	[x,y,value,min,max]
 GUIRWordInt					equ $0D			;COMPLETE	XY	[x,y,value,min,max]
 GUIRHotspot					equ $0E			;COMPLETE	XY	[x,y,width,height,ptr]
-GUIRTextMultiline			equ $0F			;COMPLETE	XY	[x,y,rows,width,curdatapos (0 to datalength***REMOVED*** [word],data]
+GUIRTextMultiline			equ $0F			;COMPLETE	XY	[x,y,rows,width,curdatapos (0 to datalength) [word],data]
 GUIRSprite					equ $10			;COMPLETE	XY	[x,y,b,data]
 GUIRLargeSprite				equ $11			;COMPLETE	XY	[x,y,a,b,data]
-GUIRPassIn					equ $12			;COMPLETE	XY	[x,y,width,maxchar [word],curdatapos (0 to datalength***REMOVED*** [word],data (z.t.***REMOVED***]
+GUIRPassIn					equ $12			;COMPLETE	XY	[x,y,width,maxchar [word],curdatapos (0 to datalength) [word],data (z.t.)]
 GUIRScrollVert				equ $13			;COMPLETE	XY	[x,y,height,ID,per,min [word],max [word],cur [word],onScrollUp,onScrollDown]
 GUIRScrollHoriz				equ $14			;COMPLETE	XY	[x,y,width,ID,per,min [word],max [word],cur [word],onScrollUp,onScrollDown]
 GUIRBorder					equ $15			;COMPLETE	XY	[x,y,width,height,color]
