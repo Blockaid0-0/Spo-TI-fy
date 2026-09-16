@@ -72,3 +72,4 @@ Testing/
 .venv
 .idea
 src/python/.cache
+CONFIG
