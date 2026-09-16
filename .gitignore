@@ -69,5 +69,5 @@ vcpkg_installed/
 Testing/
 .cache/
 .pio
-.venv
-src/python/.cache
+.venv/
+.cache
