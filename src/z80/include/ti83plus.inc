@@ -50,8 +50,8 @@ busyNormal      equ 11110000b
 ;-----------------------------------------------
 rBR_CALL        equ 28h
 BRT_JUMP0       equ 50h
-#define bcall(xxxx***REMOVED*** rst 28h \ .dw xxxx
-#define bjump(xxxx***REMOVED*** call 50h \ .dw xxxx
+#define bcall(xxxx) rst 28h \ .dw xxxx
+#define bjump(xxxx) call 50h \ .dw xxxx
 
 ;Common Restart Routines
 ;------------------------------
@@ -65,15 +65,15 @@ rFPADD          equ 30h
 ;-------------------------------------------
 APP_PUSH_ERRORH     equ 59h
 APP_POP_ERRORH      equ 5Ch
-#define AppOnErr(xxxx***REMOVED*** ld hl,xxxx \ call 59h
+#define AppOnErr(xxxx) ld hl,xxxx \ call 59h
 #define AppOffErr call 5Ch
 
 ;Page 1Bh ROM Calls
 ;--------------------------------
 _JErrorNo       equ 4000h
 _FontHook       equ 4003h
-_call_character_hook    equ 4006h ;calls character(localize***REMOVED*** hook
-_ldHLind        equ 4009h ;l=a=(hl***REMOVED***,h=(hl+1***REMOVED***
+_call_character_hook    equ 4006h ;calls character(localize) hook
+_ldHLind        equ 4009h ;l=a=(hl),h=(hl+1)
 _CpHLDE         equ 400Ch
 _DivHLBy10      equ 400Fh
 _DivHLByA       equ 4012h
@@ -85,8 +85,8 @@ _monForceKey        equ 4021h ;
 _sendKPress     equ 4024h
 _JForceCmdNoChar    equ 4027h
 _JForceCmd      equ 402Ah ;
-_sysErrHandler      equ 402Dh ;loads error context? sp=(onSP***REMOVED***
-_newContext     equ 4030h ;(kbdKey***REMOVED***=0, loads context, restores page in 4000h-7fffh
+_sysErrHandler      equ 402Dh ;loads error context? sp=(onSP)
+_newContext     equ 4030h ;(kbdKey)=0, loads context, restores page in 4000h-7fffh
 _newContext0        equ 4033h ;loads context
 _cxPutAway      equ 4036h ;
 _cxPutAway2     equ 4039h ;same but also does a B_CALL CanAlphIns
@@ -225,21 +225,21 @@ _ZeroOP         equ 41CEh
 _ClrLp          equ 41D1h
 _ShRAcc         equ 41D4h ;move high nibble in a to low nibble
 _ShLAcc         equ 41D7h ;move low nibble in a to high nibble
-_ShR18          equ 41DAh ;insert a 0 nibble at high nibble of (hl***REMOVED***, shift 9 bytes 1 nibble to right
-_SHR18A         equ 41DDh ;insert low nibble in a at high nibble of (hl***REMOVED***, shift 9 bytes 1 nibble to right
-_SHR16          equ 41E0h ;insert a 0 nibble at highnibble of (hl***REMOVED***, shift 8 bytes 1 nibble to right
-_SHR14          equ 41E3h ;insert low nibble in a at high nibble of (hl***REMOVED***, shift 7 bytes 1 nibble to right
-_SHL16          equ 41E6h ;insert nibble of 0 in low nibble of (hl***REMOVED***, shift 8 bytes (before and including (hl***REMOVED******REMOVED*** to the left 1 nibble
-_SHL14          equ 41E9h ;insert low nibble of a in low nibble of (hl***REMOVED***, shift 7 bytes (before and including (hl***REMOVED******REMOVED*** to the left 1 nibble
+_ShR18          equ 41DAh ;insert a 0 nibble at high nibble of (hl), shift 9 bytes 1 nibble to right
+_SHR18A         equ 41DDh ;insert low nibble in a at high nibble of (hl), shift 9 bytes 1 nibble to right
+_SHR16          equ 41E0h ;insert a 0 nibble at highnibble of (hl), shift 8 bytes 1 nibble to right
+_SHR14          equ 41E3h ;insert low nibble in a at high nibble of (hl), shift 7 bytes 1 nibble to right
+_SHL16          equ 41E6h ;insert nibble of 0 in low nibble of (hl), shift 8 bytes (before and including (hl)) to the left 1 nibble
+_SHL14          equ 41E9h ;insert low nibble of a in low nibble of (hl), shift 7 bytes (before and including (hl)) to the left 1 nibble
 _SRDO1          equ 41ECh
 _SHRDRND        equ 41EFh
 _MANTPA         equ 41F2h ;adds the value of a to hl which points to the end of the bcd 7 bytes long
-_ADDPROP        equ 41F5h ;adds the value of a to hl which points to the end of the bcd (b bytes long***REMOVED***
-_ADDPROPLP      equ 41F8h ;adds the value of a and carry to hl which points to the end of the bcd (b bytes long***REMOVED***
-_ADD16D         equ 41FBh ;adds the bcd numbers at (hl-7***REMOVED*** and (de-7***REMOVED***
-_ADD14D         equ 41FEh ;adds the bcd numbers at (hl-6***REMOVED*** and (de-6***REMOVED***
-_SUB16D         equ 4201h ;subtracts bcd numbers at (hl-7***REMOVED*** and (de-7***REMOVED***
-_SUB14D         equ 4204h ;subtracts bcd numbers at (hl-6***REMOVED*** and (de-6***REMOVED***
+_ADDPROP        equ 41F5h ;adds the value of a to hl which points to the end of the bcd (b bytes long)
+_ADDPROPLP      equ 41F8h ;adds the value of a and carry to hl which points to the end of the bcd (b bytes long)
+_ADD16D         equ 41FBh ;adds the bcd numbers at (hl-7) and (de-7)
+_ADD14D         equ 41FEh ;adds the bcd numbers at (hl-6) and (de-6)
+_SUB16D         equ 4201h ;subtracts bcd numbers at (hl-7) and (de-7)
+_SUB14D         equ 4204h ;subtracts bcd numbers at (hl-6) and (de-6)
 _OP2ExOP6       equ 4207h
 _OP5ExOP6       equ 420Ah
 _OP1ExOP5       equ 420Dh
@@ -258,17 +258,17 @@ _CKPosInt       equ 4231h
 _CKInt          equ 4234h
 _CKOdd          equ 4237h
 _CKOP1M         equ 423Ah
-_GETCONOP1      equ 423Dh ;a=0 opX=57.29577951308232 (1 radian in degrees***REMOVED***
-_GETCONOP2      equ 4240h ;a=1 opX=1.570796326794897 (90 deg = pi/2***REMOVED***
-                  ;a=2 opX=.7853981633974483 (45 deg = pi/4***REMOVED***
-                  ;a=3 opX=.4342944819032518 (log e***REMOVED***
-                  ;a=4 opX=3.141592653589800 (pi***REMOVED***
-                  ;a=5 opX=.0174532925199433 (pi/180 = 1 degree in radians***REMOVED***
-                  ;a=6 opX=2.302585092994046 (ln 10***REMOVED***
+_GETCONOP1      equ 423Dh ;a=0 opX=57.29577951308232 (1 radian in degrees)
+_GETCONOP2      equ 4240h ;a=1 opX=1.570796326794897 (90 deg = pi/2)
+                  ;a=2 opX=.7853981633974483 (45 deg = pi/4)
+                  ;a=3 opX=.4342944819032518 (log e)
+                  ;a=4 opX=3.141592653589800 (pi)
+                  ;a=5 opX=.0174532925199433 (pi/180 = 1 degree in radians)
+                  ;a=6 opX=2.302585092994046 (ln 10)
 _PIDIV2         equ 4243h ;not code, but a pointer to:  .db 80h,15h,70h,79h,63h,26h,79h,48h,97h
 _PIDIV4         equ 4246h ;             .db 7fh,78h,53h,98h,16h,33h,97h,44h,83h
-_PItimes2       equ 4249h ;not code, but a pointer to a 2*pi in non-OP format (no exponent byte***REMOVED***
-_PI         equ 424Ch ;not code, but a pointer to a pi in non-OP format (no exponent byte***REMOVED***
+_PItimes2       equ 4249h ;not code, but a pointer to a 2*pi in non-OP format (no exponent byte)
+_PI         equ 424Ch ;not code, but a pointer to a pi in non-OP format (no exponent byte)
 _ExpToHex       equ 424Fh
 _OP1ExpToDec        equ 4252h
 _ckop2pos       equ 4255h
@@ -295,7 +295,7 @@ _REALNAME       equ 4291h
 _SETesTOfps     equ 4294h ;moves the word at fps to es
 _markTableDirty     equ 4297h ;looks up table variable and marks VAT entry as "dirty" or selected
 _OP1MOP2EXP     equ 429Ah ;op1's exponent = op1's expoent - op2's exponent
-_OP1EXPMinusE       equ 429Dh ;a=(op1+1***REMOVED***-e
+_OP1EXPMinusE       equ 429Dh ;a=(op1+1)-e
 _CHKERRBREAK        equ 42A0h
 _isA2ByteTok        equ 42A3h
 _GETLASTENTRY       equ 42A6h
@@ -305,7 +305,7 @@ _RESETWINTOP        equ 42AFh ;takes into account grfsplitoverride and grfsplit 
 _SetYUp         equ 42B2h ;loads 7 to port 10... what does this do?
 _SetXUp         equ 42B5h ;loads 5 to port 10...
 _ISO1NONTLSTorPROG  equ 42B8h ;checks if op1 contains a list, program, group, or appvar obj name
-_ISO1NONTEMPLST     equ 42BBh ;checks if op1 contains a list (why would op1+1 contain 01, or 0d for a var name?***REMOVED***
+_ISO1NONTEMPLST     equ 42BBh ;checks if op1 contains a list (why would op1+1 contain 01, or 0d for a var name?)
 _IS_A_LSTorCLST     equ 42BEh ;checks if a = 1 or 0Dh
 _CHK_HL_999     equ 42C1h ;returns nc if less than 999, throws invalid dim error if greater than or equal to 999
 _equ_or_newequ      equ 42C4h
@@ -322,7 +322,7 @@ _GET_X_INDIRECT     equ 42E2h ;whatever this is, it uses the imathptrX locations
 _MemChk         equ 42E5h
 _CMPPRGNAMLEN1      equ 42E8h ;gets variable name length from HL
 _CMPPRGNAMLEN       equ 42EBh ;gets variable name length from OP1
-_FINDPROGSYM        equ 42EEh ;find the program whose name is in op1 (see chkfindsym in SDK***REMOVED***
+_FINDPROGSYM        equ 42EEh ;find the program whose name is in op1 (see chkfindsym in SDK)
 _ChkFindSym     equ 42F1h
 _FindSym        equ 42F4h
 _InsertMem      equ 42F7h
@@ -513,7 +513,7 @@ _wputs          equ 451Fh
 _wputsEOL       equ 4522h ;displays string in HL in big font, and uses ... if too long
 _wdispEOL       equ 4525h
 _whomeup        equ 4528h
-_setNumWindow       equ 452Bh ;based on current cursor position, sets winleft and similar (for input prompts***REMOVED***
+_setNumWindow       equ 452Bh ;based on current cursor position, sets winleft and similar (for input prompts)
 _newline        equ 452Eh
 _moveDown       equ 4531h
 _scrollUp       equ 4534h
@@ -573,8 +573,8 @@ _ZIfCatalog     equ 45D3h
 _ZIfMatrixMenu      equ 45D6h ;_loadCurCat
 _LoadMenuNum        equ 45D9h
 _LoadMenuNumL       equ 45DCh
-_MenCatRet      equ 45DFh ;restores display as though a menu were just cleared (restores some flags too***REMOVED***
-_MenuSwitchContext  equ 45E2h ;switches to context in A, calls menu hook with A=3, set 5,(iy+16h***REMOVED*** for some sort of override to not make switch
+_MenCatRet      equ 45DFh ;restores display as though a menu were just cleared (restores some flags too)
+_MenuSwitchContext  equ 45E2h ;switches to context in A, calls menu hook with A=3, set 5,(iy+16h) for some sort of override to not make switch
 _MenuEdKey      equ 45E5h
 _BackUpGraphSettings    equ 45E8h
 _notalphnum     equ 45EBh
@@ -704,7 +704,7 @@ _CommonKeys     equ 475Ch
 _Leftmore       equ 475Fh
 _fDel           equ 4762h
 _fClear         equ 4765h
-_finsDisp       equ 4768h ;Michael says _FinsDisp02 equ 4768h (something's not right***REMOVED***
+_finsDisp       equ 4768h ;Michael says _FinsDisp02 equ 4768h (something's not right)
 _FinsDisp02     equ 476Bh ;_setIndicator
 _closeeditbufnor    equ 476Eh
 _releaseBuffer      equ 4771h
@@ -715,7 +715,7 @@ _numRedisp      equ 477Dh
 _numError02     equ 4780h
 _Load_SFont     equ 4783h
 _SFont_Len      equ 4786h
-_InitNumVec     equ 4789h ;inits window settings/table setup/finance solver context (dialog-like***REMOVED***
+_InitNumVec     equ 4789h ;inits window settings/table setup/finance solver context (dialog-like)
 _SetXXOP1       equ 478Ch
 _SetXXOP2       equ 478Fh
 _SetXXXXOP2     equ 4792h
@@ -727,7 +727,7 @@ _YToX           equ 47A1h
 _ZmStats        equ 47A4h
 _POINT_STAT_HLP     equ 47A7h
 _DRAWSPLOT      equ 47AAh
-_INITNEWTRACEP      equ 47ADh ;A is input here, goes to (8E63h***REMOVED***
+_INITNEWTRACEP      equ 47ADh ;A is input here, goes to (8E63h)
 _SPLOTCOORD     equ 47B0h
 _SPLOTRIGHT     equ 47B3h
 _SPLOTLEFT      equ 47B6h
@@ -762,7 +762,7 @@ _GrRedisp       equ 480Ah
 _GDISPTOKEN     equ 480Dh
 _GRDECODA       equ 4810h
 _LABCOOR        equ 4813h ;draws labels with _GRLABELS and X/Y/whatever coordinates, including stat plot stuff
-_COORDISP       equ 4816h ;draws X & Y coordinates (or R and theta if PolarGC***REMOVED***
+_COORDISP       equ 4816h ;draws X & Y coordinates (or R and theta if PolarGC)
 _TMPEQUNOSRC        equ 4819h
 _GRLABELS       equ 481Ch
 _YPIXSET        equ 481Fh
@@ -806,8 +806,8 @@ _Regraph        equ 488Eh
 _DOREFFLAGS02       equ 4891h ;something wrong here
 INITNSEQ        equ 4894h
 _YRES           equ 4897h ;_PLOTPTXY2
-_Ceiling        equ 489Ah ;ceil(OP1***REMOVED***
-_PutXY          equ 489Dh ;draws X & Y coordinates (regardless of PolarGC***REMOVED***
+_Ceiling        equ 489Ah ;ceil(OP1)
+_PutXY          equ 489Dh ;draws X & Y coordinates (regardless of PolarGC)
 _PUTEQUNO       equ 48A0h
 _PDspGrph       equ 48A3h
 _HorizCmd       equ 48A6h
@@ -914,7 +914,7 @@ _setupdispeq        equ 49D2h
 _DispForward        equ 49D5h
 _DispYPrompt2       equ 49D8h
 _stringwidth        equ 49DBh
-_dispErrorScreen    equ 49DEh ;displays top row of error screen (error message***REMOVED***
+_dispErrorScreen    equ 49DEh ;displays top row of error screen (error message)
 _POPCX          equ 49E1h ;moves 14 bytes at cxPrev to cxMain, 15th byte goes to replace appflags
 _loadnoeentry       equ 49E4h
 _SaveScreen     equ 49E7h
@@ -925,7 +925,7 @@ _SolveRedisp        equ 49F3h
 _SolveDisp      equ 49F6h
 _itemName       equ 49F9h
 _SetNorm_Vals       equ 49FCh
-_SetYOffset     equ 49FFh ;sets up YOffset and next 4 bytes (possibly specialized for the table editor***REMOVED***
+_SetYOffset     equ 49FFh ;sets up YOffset and next 4 bytes (possibly specialized for the table editor)
 _ConvKeyToTok       equ 4A02h
 _ConvFCKeyToTok     equ 4A05h
 _ConvFEKeyToTok     equ 4A08h
@@ -1012,8 +1012,8 @@ _PARSE_FORMULA      equ 4AF5h
 _FetchQuotedString  equ 4AF8h
 _FetchNumLine       equ 4AFBh
 _ParseNameTokens    equ 4AFEh
-_ParseInpGraph      equ 4B01h ;same as _ParseInp except 3,(iy+1Fh***REMOVED*** is graph/split screen override, or something
-_ParseInpGraphReset equ 4B04h ;_ParseInpGraph except zeroes out iy+6/7, resets 3,(iy+1Ah***REMOVED*** & 0,(iy+1Fh***REMOVED***, fmtFlags->fmtOverride, parse within ParseInp?
+_ParseInpGraph      equ 4B01h ;same as _ParseInp except 3,(iy+1Fh) is graph/split screen override, or something
+_ParseInpGraphReset equ 4B04h ;_ParseInpGraph except zeroes out iy+6/7, resets 3,(iy+1Ah) & 0,(iy+1Fh), fmtFlags->fmtOverride, parse within ParseInp?
 _ParseInpLastEnt    equ 4B07h ;ParseInp on program 05h,23h,00h
 _ErrOnCertainTypes  equ 4B0Ah ;ERR:DATA TYPE if A is one of a couple of values...subroutine in ParseInp, somehow
 _CreatePair     equ 4B0Dh
@@ -1055,7 +1055,7 @@ _CURFETCH       equ 4B76h
 _Random         equ 4B79h
 _StoRand        equ 4B7Ch
 _RandInit       equ 4B7Fh
-_resetStacks        equ 4B82h ;(onsp***REMOVED***->(errsp***REMOVED***, (fpbase***REMOVED***->(fps***REMOVED***, (opbase***REMOVED***->(ops***REMOVED***
+_resetStacks        equ 4B82h ;(onsp)->(errsp), (fpbase)->(fps), (opbase)->(ops)
 _Factorial      equ 4B85h
 _YONOFF         equ 4B88h
 _EQSELUNSEL     equ 4B8Bh
@@ -1139,12 +1139,12 @@ _OPSet0DE       equ 4C72h ;loads a floating point 0 to location de
 _AppGetCbl      equ 4C75h
 _AppGetCalc     equ 4C78h
 _SaveDisp       equ 4C7Bh
-_SetIgnoreKey       equ 4C7Eh ;set 1,(iy+28h***REMOVED*** / ret
-_SetSendThisKeyBack equ 4C81h ;set 2,(iy+28h***REMOVED*** / ld (kbdKey***REMOVED***,a / ret
+_SetIgnoreKey       equ 4C7Eh ;set 1,(iy+28h) / ret
+_SetSendThisKeyBack equ 4C81h ;set 2,(iy+28h) / ld (kbdKey),a / ret
 _DisableApd     equ 4C84h
-_EnableApd      equ 4C87h ;set apdable,(iy+apdflags***REMOVED***
+_EnableApd      equ 4C87h ;set apdable,(iy+apdflags)
 _JForceCmdNoChar2   equ 4C8Ah ;2.41 at least
-_set2IY34       equ 4C8Dh ;set 2,(iy+34***REMOVED*** / ret
+_set2IY34       equ 4C8Dh ;set 2,(iy+34) / ret
 _forcecmd       equ 4C90h
 _ApdSetup       equ 4C93h
 _Get_NumKey     equ 4C96h
@@ -1195,8 +1195,8 @@ _ClearRow       equ 4CEDh
 ;4D1Dh
 ;4D20h
 ;4D23h
-_AppScreenUpDown    equ 4D26h ;shifts screen up/down, A is LCD row, H is number of lines to shift, (OP1***REMOVED***-(OP1+3***REMOVED*** are something
-_AppScreenUpDown1   equ 4D29h ;shifts screen up/down, but really no clue what the inputs are (all registers and (OP1***REMOVED***-(OP1+3***REMOVED******REMOVED***
+_AppScreenUpDown    equ 4D26h ;shifts screen up/down, A is LCD row, H is number of lines to shift, (OP1)-(OP1+3) are something
+_AppScreenUpDown1   equ 4D29h ;shifts screen up/down, but really no clue what the inputs are (all registers and (OP1)-(OP1+3))
 ;4D2Ch
 _initsmalleditlinevar   equ 4D2Fh
 _initsmalleditlineop1   equ 4D32h
@@ -1212,7 +1212,7 @@ _AppMouseGetKey     equ 4D4Dh
 _AppDispMouse       equ 4D50h
 _AppEraseMouse      equ 4D53h
 _AppSetupMouseMem   equ 4D56h
-_GetDispRowOffset   equ 4D59h ;HL=A*12 (intended for A to be row and HL becomes offset into plotSScreen***REMOVED***
+_GetDispRowOffset   equ 4D59h ;HL=A*12 (intended for A to be row and HL becomes offset into plotSScreen)
 _ClearRect      equ 4D5Ch
 _InvertRect     equ 4D5Fh
 _FillRect       equ 4D62h
@@ -1247,7 +1247,7 @@ _ShiftBitsLeft      equ 4DA7h ;mouse subroutine, shifts B bits left from DE spri
 ;4DB9h ;mouse subroutine
 ;4DBCh ;mouse subroutine
 _AppUpdateMouseRow  equ 4DBFh
-_AppDrawMouse       equ 4DC2h ;set 2,(iy+2Ch***REMOVED*** for AppEraseMouse, reset for AppDispMouse
+_AppDrawMouse       equ 4DC2h ;set 2,(iy+2Ch) for AppEraseMouse, reset for AppDispMouse
 _AppDrawMouseDirect equ 4DC5h ;pretty much _AppDrawMouse, but you pass LCD column in A
 _CPoint         equ 4DC8h
 _DeleteApp      equ 4DCBh
@@ -1406,8 +1406,8 @@ _EnableLocalizeHook equ 4F93h
 _DisableLocalizeHook    equ 4F96h
 _SetTokenHook       equ 4F99h
 _ClearTokenHook     equ 4F9Ch
-;4F9Fh ld hl,92c6 / ld a,(92c5***REMOVED*** / res 2,a / cp (hl***REMOVED*** / ret
-;4FA2h hl=11*(92fc***REMOVED***+92c9 / ld a,(hl***REMOVED*** / and Fh / cp 2 / ret ; I can almost guarantee this is stat plot related
+;4F9Fh ld hl,92c6 / ld a,(92c5) / res 2,a / cp (hl) / ret
+;4FA2h hl=11*(92fc)+92c9 / ld a,(hl) / and Fh / cp 2 / ret ; I can almost guarantee this is stat plot related
 _DispListElementOffLA   equ 4FA5h
 _Bit_VertSplit      equ 4FA8h
 _SetHomescreenHook  equ 4FABh
@@ -1426,7 +1426,7 @@ _SetYeditHook       equ 4FCFh
 _DisableYEquHook    equ 4FD2h
 _JForceYEqu     equ 4FD5h
 _Arc_Unarc      equ 4FD8h ;checks for low battery
-_ArchiveVar     equ 4FDBh ;set 0,(iy+24h***REMOVED*** to check for low battery first
+_ArchiveVar     equ 4FDBh ;set 0,(iy+24h) to check for low battery first
 _UnarchiveVar       equ 4FDEh
 _DialogKeyHook      equ 4FE1h ;rawkey hook used by OS for dialog context
 _SetFontHook        equ 4FE4h
@@ -1500,7 +1500,7 @@ _FormBase       equ 50AAh
 _IsFragmented       equ 50B0h
 _Chk_Batt_Low       equ 50B3h
 _Chk_Batt_Low_2     equ 50B6h
-_Arc_Unarc2     equ 50B9h ;identical to _Arc_Unarc, except you can choose to res 0,(iy+24h***REMOVED*** to skip low battery check
+_Arc_Unarc2     equ 50B9h ;identical to _Arc_Unarc, except you can choose to res 0,(iy+24h) to skip low battery check
 _GetAppBasePage     equ 50BCh ;input: a=one of an app's pages. output: a=app's first page
 _SetExSpeed     equ 50BFh
 _RclExit        equ 50C2h
@@ -1534,7 +1534,7 @@ _DeleteTempEditEqu  equ 5113h
 _JcursorFirst2      equ 5116h
 ;5119h
 _PromptMoveBackLeft equ 511Ch
-_wputsEOL2      equ 511Fh ;same except res 0,(iy+0Eh***REMOVED*** first
+_wputsEOL2      equ 511Fh ;same except res 0,(iy+0Eh) first
 _InvertTextInsMode  equ 5122h
 ;5125h
 _ResetDefaults      equ 5128h
@@ -1589,7 +1589,7 @@ _IsOP1ResID     equ 51B8h
 _ListEdNameCxMain   equ 51BBh
 _ListEdEnterNewName equ 51BEh
 ;51C1h
-_ForceModeKeypress  equ 51C4h ;forces a keypress (and calls help hook***REMOVED*** on any of several mode-setting contexts
+_ForceModeKeypress  equ 51C4h ;forces a keypress (and calls help hook) on any of several mode-setting contexts
 _DispAboutScreen    equ 51C7h
 _ChkHelpHookVer     equ 51CAh
 _Disp32         equ 51CDh
@@ -1638,7 +1638,7 @@ _NamedListToOP1     equ 5248h
 ;524Eh
 ;5251h
 _InitUSBDeviceCallback  equ 5254h
-_KillUSBDevice      equ 5257h ;this actually recycles the USB connection and re-inits it (I think***REMOVED***
+_KillUSBDevice      equ 5257h ;this actually recycles the USB connection and re-inits it (I think)
 _SetUSBConfiguration    equ 525Ah
 _RequestUSBData     equ 525Dh
 _StopReceivingUSBData   equ 5260h
@@ -1684,7 +1684,7 @@ _VDispRealOP1       equ 52D5h
 _DispXEqualsNum     equ 52D8h
 _ResetGraphSettings equ 52DBh
 _InitializeVariables    equ 52DEh
-;52E1h ;bit 4,(9C75h***REMOVED*** (this is DEFINITELY returning the status of something when acting as a TI-SmartView Input Pad...this bit is bit 1 of the data byte from a PC HID Set Report request***REMOVED***
+;52E1h ;bit 4,(9C75h) (this is DEFINITELY returning the status of something when acting as a TI-SmartView Input Pad...this bit is bit 1 of the data byte from a PC HID Set Report request)
 _DelVarSym      equ 52E4h
 _FindAppUpNoCase    equ 52E7h
 _FindAppDnNoCase    equ 52EAh
@@ -1699,7 +1699,7 @@ _SetupHome      equ 5302h
 _GRPUTAWAYFull      equ 5305h ;same as _GRPUTAWAY except it assumes no split screen
 _SendSmartPadKeypress   equ 5308h ;B and A are the inputs
 _ToggleUSBSmartPadInput equ 530Bh ;A is input, 0 or 1 to enable/disable
-_IsUSBDeviceConnected   equ 530Eh ;bit 4,(81h***REMOVED*** \ ret, this is just a guess on its purpose but it seems to work
+_IsUSBDeviceConnected   equ 530Eh ;bit 4,(81h) \ ret, this is just a guess on its purpose but it seems to work
 _RecycleUSB     equ 5311h ;identical to 5257h
 _PolarEquToOP1      equ 5314h
 _ParamXEquToOP1     equ 5317h
@@ -1812,7 +1812,7 @@ _ret                equ 5449h
 ;Page 1Fh ROM Calls
 ;--------------------------------
 bootbtf             equ 8000h
-;400Fh may point to version string ("1.02 ",0***REMOVED***
+;400Fh may point to version string ("1.02 ",0)
 _MD5Final           equ 8018h
 _RSAValidate            equ 801Bh
 _cmpStr             equ 801Eh ;BigNumCompare
@@ -1848,7 +1848,7 @@ _FindOSHeaderSubField       equ 8075h
 _FindNextCertField      equ 8078h
 _GetByteOrBoot          equ 807Bh
 _getSerial          equ 807Eh ;GetCalcSerial
-_ReceiveCalcID          equ 8081h ;receives certificate replacement (including calculator ID, fails if already exists***REMOVED*** and writes it, requires Flash unlocked
+_ReceiveCalcID          equ 8081h ;receives certificate replacement (including calculator ID, fails if already exists) and writes it, requires Flash unlocked
 _EraseFlashPage         equ 8084h
 _WriteFlashUnsafe       equ 8087h
 _dispBootVer            equ 808Ah
@@ -1865,7 +1865,7 @@ _IsAppFreeware          equ 80A8h
 _FindAppHeaderSubField      equ 80ABh
 _WriteValidationNumber      equ 80AEh ;generates two-byte validation number from calc ID and stores to certificate
 _Div32By16          equ 80B1h
-_FindGroup          equ 80B4h ;searches until field of DE-like group is found (DE=0A00h, it stops when it finds 0Ax0h***REMOVED***
+_FindGroup          equ 80B4h ;searches until field of DE-like group is found (DE=0A00h, it stops when it finds 0Ax0h)
 _getBootVer         equ 80B7h
 _getHardwareVersion     equ 80BAh
 _xorA               equ 80BDh ;xor a
@@ -1888,9 +1888,9 @@ _DisplayOSProgress      equ 80F9h
 _ResetCalc          equ 80FCh
 _SetupOSPubKey          equ 80FFh
 _CheckHeaderKeyHL       equ 8102h ;same as _CheckHeaderKey, only you pass the address of header in HL, not at appData
-_USBErrorCleanup        equ 8105h ;kills some USB stuff (doesn't completely kill periph communication***REMOVED***, error handler in boot code
-_InitUSB            equ 8108h ;initializes USB hardware as peripheral, sets 5,(iy+1Bh***REMOVED***, C set if problems
-;810Bh set 1,(81h***REMOVED*** and wait (has something to do with USB peripheral kill, but it doesn't actually kill it***REMOVED***
+_USBErrorCleanup        equ 8105h ;kills some USB stuff (doesn't completely kill periph communication), error handler in boot code
+_InitUSB            equ 8108h ;initializes USB hardware as peripheral, sets 5,(iy+1Bh), C set if problems
+;810Bh set 1,(81h) and wait (has something to do with USB peripheral kill, but it doesn't actually kill it)
 _KillUSB            equ 810Eh ;identical to 8105h, except in the middle of the outputs, it sends zero to port 4Ch
 _DisplayBootError1      equ 8111h
 _DisplayBootError2      equ 8114h
@@ -1917,7 +1917,7 @@ SmallEditRowCount   equ 81B7h
 bigInteger2     equ 81C3h
 SmallEditPromptString   equ 81CCh
 ramCodeEnd      equ 822Fh
-baseAppBrTab        equ 8230h ;table of base pages for apps on page < 20h (starts with eight zeroes because they're OS pages***REMOVED***
+baseAppBrTab        equ 8230h ;table of base pages for apps on page < 20h (starts with eight zeroes because they're OS pages)
 clockFlag       equ 8230h ;bit 2 set for 24-hour mode and don't display "AM/PM"
 clockIDs        equ 8231h ;five bytes, numbers 0-4 in memory, that when present, stops displaying clock numbers in time setting context?
 bootTemp        equ 8251h
@@ -2065,7 +2065,7 @@ asm_prgm_size       equ 89ECh
 bstCounter      equ 89EEh
 flags           equ 89F0h
 appFlagsAddr        equ 89FDh
-;something      equ 8A36h ;stats-related? This gets stored to (varCurrent***REMOVED*** for some reason
+;something      equ 8A36h ;stats-related? This gets stored to (varCurrent) for some reason
 statVars        equ 8A3Ah
 anovaf_vars     equ 8C17h
 infVars         equ 8C4Dh
@@ -2106,10 +2106,10 @@ pixWideP        equ 8DA4h
 pixWide_m_1     equ 8DA5h
 pixWide_m_2     equ 8DA6h
 lastEntryPTR        equ 8DA7h ;pointer to the next available byte in the entry stack
-lastEntryStk        equ 8DA9h ;the start of entry stack (note last entry is not in the stack, it is in the program '#'.***REMOVED***  This is a stack of strings.  first 2 bytes are length, followed by string. 2nd from last entry is first in this stack.
+lastEntryStk        equ 8DA9h ;the start of entry stack (note last entry is not in the stack, it is in the program '#'.)  This is a stack of strings.  first 2 bytes are length, followed by string. 2nd from last entry is first in this stack.
 numLastEntries      equ 8E29h ;number of entries you can back-track through minus one
 currLastEntry       equ 8E2Ah ;counter used by OS to keep track of which entry was just displayed by pressing 2nd+enter
-curPlotNumber       equ 8E63h ;current plot being graphed (1-3***REMOVED***, this gets reset back to 0
+curPlotNumber       equ 8E63h ;current plot being graphed (1-3), this gets reset back to 0
 ;something      equ 8E65h
 ;something      equ 8E66h
 curInc          equ 8E67h
@@ -2235,8 +2235,8 @@ matrixDimensions    equ 9702h ;dimensions of matrix being edited in matrix edito
 editSym         equ 9706h ;pointer to symbol table entry of variable being edited
 editDat         equ 9708h ;pointer to data of variable being edited
 ;something      equ 970Eh ;stats/list editor related, usually 1
-;something      equ 970Fh ;stats/list editor related, usually 0 (this is 0-based offset from listName1***REMOVED***, pretty sure this is a page offset
-;something      equ 9710h ;stats/list editor related, usually 0 (this is 0-based currently-selected list***REMOVED***
+;something      equ 970Fh ;stats/list editor related, usually 0 (this is 0-based offset from listName1), pretty sure this is a page offset
+;something      equ 9710h ;stats/list editor related, usually 0 (this is 0-based currently-selected list)
 listName1       equ 9711h
 listName2       equ 9716h
 listName3       equ 971Bh
@@ -2323,7 +2323,7 @@ pagedPN         equ 9835h
 pagedGetPtr     equ 9836h
 pagedPutPtr     equ 9838h
 pagedBuf        equ 983Ah
-;something      equ 984Ah ;this is the top LCD row for a menu (usually 1***REMOVED***
+;something      equ 984Ah ;this is the top LCD row for a menu (usually 1)
 appErr1         equ 984Dh
 appErr2         equ 985Ah
 flashByte1      equ 9867h
@@ -2375,9 +2375,9 @@ usb_dataExpectCount equ 9C80h
 offPageCallPage     equ 9C83h ;temporarily stores off-page page and address
 offPageCallAddress  equ 9C84h
 ;something      equ 9C86h ;used with SE link activity, values of 00h, 0FAh, 0FFh probably mean something
-;something      equ 9C87h ;zero this to force the APPS menu to recache itself (this is always either 0, 1, or last app page, for some reason***REMOVED***
-;something      equ 9C88h ;don't know, but it's 14 bytes and has to do with selecting stuff (if 9C87h is non-zero, this is zeroed out***REMOVED***
-;something      equ 9C9Eh ;funky, this actually gets written to the certificate on non-83+ (11 bytes***REMOVED***
+;something      equ 9C87h ;zero this to force the APPS menu to recache itself (this is always either 0, 1, or last app page, for some reason)
+;something      equ 9C88h ;don't know, but it's 14 bytes and has to do with selecting stuff (if 9C87h is non-zero, this is zeroed out)
+;something      equ 9C9Eh ;funky, this actually gets written to the certificate on non-83+ (11 bytes)
 SEspeed         equ 9CAEh
 ;something, table index equ 9CAFh
 ;something      equ 9CB0h
@@ -2413,7 +2413,7 @@ ansFlags        equ 1
 AnsScroll       equ 3       ;1=answer can scroll, seems must be reset in order to move about edit buffer
 
 monFlags        equ 1h   ;monitor flags
-monAbandon      equ 4       ;1=don't start any long process in put away (#715***REMOVED***
+monAbandon      equ 4       ;1=don't start any long process in put away (#715)
 ;----------------------------------------------------------------------
 plotFlags       equ 2h  ;plot generation flags
 plotLoc         equ 1       ;0=bkup & display, 1=display only
@@ -2426,7 +2426,7 @@ grfParamM       equ 6       ;1=parametric graph
 grfRecurM       equ 7       ;1=RECURSION graph
 ;----------------------------------------------------------------------
 graphFlags      equ 3h
-graphDraw       equ 0       ;0=graph is valid, 1=redraw graph(dirty***REMOVED***
+graphDraw       equ 0       ;0=graph is valid, 1=redraw graph(dirty)
 graphCursor     equ 2
 ;----------------------------------------------------------------------
 grfDBFlags      equ 4h
@@ -2559,7 +2559,7 @@ reTable         equ 6       ;0=table is okay, 1=must recompute table.
 ;----------------------------------------------------------------------
 sGrFlags        equ 14h
 grfSplit        equ 0       ;1=Split Graph, 0=Normal
-vertSplit       equ 1       ;1=Vertical (left-right***REMOVED*** Split
+vertSplit       equ 1       ;1=Vertical (left-right) Split
 grfSChanged     equ 2       ;1=Graph just changed Split <-> normal
 grfSplitOverride    equ 3       ;1 = ignore graph split flag if set
 write_on_graph      equ 4       ;1 = TEXT OR EQU WRITING TO GRAPH SCREEN
@@ -2592,13 +2592,13 @@ statFlags2      equ 1Ah
 statDiagnosticsOn   equ 0       ;1 = stat diagnostics on
 ;----------------------------------------------------------------------
 linkFlags       equ 1Bh
-IDis95h         equ 1       ;1 = link routines use machine ID 95h (CBL***REMOVED***
-IDis82h         equ 2       ;1 = link routines use machine ID 82h (TI-82***REMOVED***
-IDis83h         equ 3       ;1 = link routines use machine ID 83h (TI-83***REMOVED***
-IDis03h         equ 4       ;1 = link routines use machine ID 03h (PC to TI-83***REMOVED***
+IDis95h         equ 1       ;1 = link routines use machine ID 95h (CBL)
+IDis82h         equ 2       ;1 = link routines use machine ID 82h (TI-82)
+IDis83h         equ 3       ;1 = link routines use machine ID 83h (TI-83)
+IDis03h         equ 4       ;1 = link routines use machine ID 03h (PC to TI-83)
 USBenabled      equ 5       ;1 = use USB port first, or at least try to
 ;----------------------------------------------------------------------
-;There is a flag 1Ch (stats-related***REMOVED***.
+;There is a flag 1Ch (stats-related).
 ;----------------------------------------------------------------------
 ;There is a flag 1Dh.
 ;----------------------------------------------------------------------
@@ -2660,7 +2660,7 @@ mouseFlag1      equ 2Ch
 ;----------------------------------------------------------------------
 mouseFlag2      equ 2Dh ;might want to keep this always reset
 ;----------------------------------------------------------------------
-xapFlag0        equ 2Eh ;external app flags, do not use 0,(iy+2Eh***REMOVED*** (used by mouse routines***REMOVED***
+xapFlag0        equ 2Eh ;external app flags, do not use 0,(iy+2Eh) (used by mouse routines)
 xapFlag1        equ 2Fh
 xapFlag2        equ 30h
 xapFlag3        equ 31h
@@ -2676,7 +2676,7 @@ alt_Off         equ 1       ;run OFFSCRPT at shutdown
 useRclQueueEnd      equ 2       ;1 = external mode
 ignoreBPLink        equ 3       ;1 = override flag for link activity hook
 bPLinkOn        equ 4       ;1 = link activity hook active
-enableKeyEcho       equ 5       ;1 = sends keypresses back to connected calc as remote control packets (with GetCSC vs. GetKey codes...really dumb, TI***REMOVED***
+enableKeyEcho       equ 5       ;1 = sends keypresses back to connected calc as remote control packets (with GetCSC vs. GetKey codes...really dumb, TI)
 noTempDelete        equ 6       ;1 = do not delete temporary programs at homescreen
 ;----------------------------------------------------------------------
 hookflags2      equ 34h ;also sysHookFlg
@@ -2728,22 +2728,22 @@ silentLinkFlags     equ 3Eh
 silentLinkActive    equ 0       ;1 = SE/84+ silent link is active
 
 extraHookFlags      equ 3Eh
-checkCatalog2HookVer    equ 3       ;1 = check catalog 2 hook's version before executing it (and error or take other action if so***REMOVED***
-openLibActive       equ 4       ;1 = OpenLib( was successfully called on a Flash application (ExecLib will error if zero***REMOVED***
+checkCatalog2HookVer    equ 3       ;1 = check catalog 2 hook's version before executing it (and error or take other action if so)
+openLibActive       equ 4       ;1 = OpenLib( was successfully called on a Flash application (ExecLib will error if zero)
 ;5
 ;----------------------------------------------------------------------
 clockFlags      equ 3Fh
 notMDYMode      equ 0       ;0 = M/D/Y format
 isYMDMode       equ 1       ;1 = Y/M/D format
 is24Hour        equ 2       ;1 = clock in 24 hour mode
-inAfternoon     equ 3       ;1 = current time is in afternoon (PM***REMOVED*** (I think***REMOVED***
-useTokensInString   equ 4       ;1 = use tokens instead of characters when displaying clock as string (for getTmStr and getDtStr vs. MODE screen***REMOVED*** (keep this reset***REMOVED***
-displayClock        equ 5       ;1 = display clock (this is set every second, reset otherwise***REMOVED***
+inAfternoon     equ 3       ;1 = current time is in afternoon (PM) (I think)
+useTokensInString   equ 4       ;1 = use tokens instead of characters when displaying clock as string (for getTmStr and getDtStr vs. MODE screen) (keep this reset)
+displayClock        equ 5       ;1 = display clock (this is set every second, reset otherwise)
 clockOn         equ 6       ;1 = clock on
 ;----------------------------------------------------------------------
 USBFlag1        equ 40h
 ;1 Reset in I/O receiving code, doesn't seem to be used anywhere else
-usbReceiveZone1     equ 2       ;1 = receive to RAM pages 3/2 ("zone 1"***REMOVED***
+usbReceiveZone1     equ 2       ;1 = receive to RAM pages 3/2 ("zone 1")
 ;----------------------------------------------------------------------
 USBFlag2        equ 41h
 ;0
@@ -2756,7 +2756,7 @@ usbDataWaiting      equ 5
 USBFlag3        equ 42h
 ;----------------------------------------------------------------------
 USBFlag4        equ 43h
-usbTimeoutError     equ 0       ;1 = USB timeout error (crystal timer expired***REMOVED***
+usbTimeoutError     equ 0       ;1 = USB timeout error (crystal timer expired)
 ;----------------------------------------------------------------------
 
 ;Character Font Equates  
@@ -3001,9 +3001,9 @@ LGanimate       equ 0EDh ; = 5
 LGdot           equ 0EEh ; = 6
 LUpBlk          equ 0EFh ;Up arrow and Block in solver
 LDnBlk          equ 0F0h ;Down arrow and Block in solver
-LcurFull        equ 0F1h ;note: must be last char (PutMap checks***REMOVED***
+LcurFull        equ 0F1h ;note: must be last char (PutMap checks)
 
-;(MenuCurrent***REMOVED*** Values
+;(MenuCurrent) Values
 ;--------------------------
 mConfirmation       equ 01h
 mApps           equ 02h
@@ -3200,7 +3200,7 @@ kWindow         equ 048h ;RANGE EDITOR
 kYequ           equ 049h ;EQUATION EDITOR
 kTable          equ 04Ah ;TABLE EDITOR
 kTblSet         equ 04Bh ;TABLE SET
-kChkRAM         equ 04Ch ;CHECK RAM (About screen***REMOVED***
+kChkRAM         equ 04Ch ;CHECK RAM (About screen)
 kDelMem         equ 04Dh ;DELETE MEM
 kResetMem       equ 04Eh ;RESET MEM
 kResetDef       equ 04Fh ;RESET DEFAULT
@@ -3388,7 +3388,7 @@ kExtendEcho2        equ 0FCh
 
 ;THIS KEY MEANS THAT THE KEY PRESS IS ONE THAT ECHOS
 ;INTO A BUFFER, AND IT IS A 2 BYTE KEY CODE, GO LOOK AT
-;(EXTECHO***REMOVED*** FOR THE KEY VALUE 
+;(EXTECHO) FOR THE KEY VALUE
 ;------------------------------------------------------
 kExtendEcho     equ 0FEh
 
@@ -4055,7 +4055,7 @@ tTrnspos        equ tPOST1+4 ;0Eh Ltranspose
 tCube           equ tPOST1+5 ;0Fh '^3'
 ;
 tLParen         equ 10h ;10h '('
-tRParen         equ 11h ;11h '***REMOVED***'
+tRParen         equ 11h ;11h ')'
 ;
 IMUN            equ 12h
 ;
@@ -4231,7 +4231,7 @@ tBoxIcon        equ 7Fh
 tCrossIcon      equ 80h
 tDotIcon        equ 81h
 
-;(More***REMOVED*** Binary OP
+;(More) Binary OP
 ;---------------------------------------
 tMul            equ 82h ;82h '*'
 tDiv            equ 83h ;83h '/'
@@ -4256,7 +4256,7 @@ tPrtScrn        equ GRCMDS+13 ; 91h 'PrtScrn'
 tZoomSto        equ GRCMDS+14 ; 92h  ZOOM STORE
 tText           equ GRCMDS+15 ; 93h
 
-;Binary OP (Combination & Permutation***REMOVED***
+;Binary OP (Combination & Permutation)
 ;-------------------------------------------------
 tnPr            equ GRCMDS+16 ;94h '_nPr_'
 tnCr            equ GRCMDS+17 ;95h '_nCr_'
@@ -4528,8 +4528,8 @@ tStr0           equ 09h
 tRegEq          equ 01h ;REGRESSION EQUATION
 tStatN          equ 02h ;STATISTICS N
 tXMean          equ 03h ;X MEAN
-tSumX           equ 04h ;SUM(X***REMOVED***
-tSumXSqr        equ 05h ;SUM(X^2***REMOVED***
+tSumX           equ 04h ;SUM(X)
+tSumXSqr        equ 05h ;SUM(X^2)
 tStdX           equ 06h ;STANDARD DEV X
 tStdPX          equ 07h ;STANDARD DEV POP X
 tMinX           equ 08h ;Min X VALUE
@@ -4537,13 +4537,13 @@ tMaxX           equ 09h ;Max X VALUE
 tMinY           equ 0Ah ;Min Y VALUE
 tMaxY           equ 0Bh ;Max Y VALUE
 tYmean          equ 0Ch ;Y MEAN
-tSumY           equ 0Dh ;SUM(Y***REMOVED***
-tSumYSqr        equ 0Eh ;SUM(Y^2***REMOVED***
+tSumY           equ 0Dh ;SUM(Y)
+tSumYSqr        equ 0Eh ;SUM(Y^2)
 tStdY           equ 0Fh ;STANDARD DEV Y
 tStdPY          equ 10h ;STANDARD DEV POP Y
-tSumXY          equ 11h ;SUM(XY***REMOVED***
+tSumXY          equ 11h ;SUM(XY)
 tCorr           equ 12h ;CORRELATION
-tMedX           equ 13h ;MED(X***REMOVED***
+tMedX           equ 13h ;MED(X)
 tQ1         equ 14h ;1ST QUADRANT OF X
 tQ3         equ 15h ;3RD QUADRANT OF X
 tQuadA          equ 16h ;1ST TERM OF QUAD POLY REG/ Y-INT
@@ -4600,8 +4600,8 @@ tXscl           equ 2
 tYscl           equ 3
 tRecuru0        equ 4 ;U 1ST INITIAL COND
 tRecurv0        equ 5 ;V 1ST INITIAL COND
-tun1            equ 6 ;U(N-1***REMOVED***; NOT USED
-tvn1            equ 7 ;V(N-1***REMOVED***; NOT USED
+tun1            equ 6 ;U(N-1); NOT USED
+tvn1            equ 7 ;V(N-1); NOT USED
 tuRecuru0       equ 8 ;
 tuRecurv0       equ 9 ;
 tXmin           equ 0Ah
@@ -4644,17 +4644,17 @@ tFinPMT         equ 2Eh
 tFinFV          equ 2Fh
 tFinPY          equ 30h
 tFinCY          equ 31h
-tRecurw0        equ 32h ;w0(1***REMOVED***
+tRecurw0        equ 32h ;w0(1)
 tuRecurw0       equ 33h
 tPlotStep       equ 34h
 tuPlotStep      equ 35h
 tXres           equ 36h
 tuXres          equ 37h
-tRecuru02       equ 38h ;u0(2***REMOVED***
+tRecuru02       equ 38h ;u0(2)
 tuRecuru02      equ 39h
-tRecurv02       equ 3Ch ;v0(2***REMOVED***
+tRecurv02       equ 3Ch ;v0(2)
 tuRecurv02      equ 3Dh
-tRecurw02       equ 3Eh ;w0(2***REMOVED***
+tRecurw02       equ 3Eh ;w0(2)
 tuRecurw02      equ 3Fh
 
 ;2nd Byte Of t2ByteTok Tokens
@@ -4892,7 +4892,7 @@ D0LD1L          equ 03h
 D0LD1H          equ 01h
 D0HD1L          equ 02h
 D0HD1H          equ 00h
-bport           equ 0 ;4-bit link port (I/O***REMOVED*** 
+bport           equ 0 ;4-bit link port (I/O)
 
 ;Device Codes
 ;-----------------------------------------------------------------

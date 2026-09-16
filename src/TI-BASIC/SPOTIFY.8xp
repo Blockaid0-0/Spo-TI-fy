@@ -42,8 +42,8 @@ Repeat K=45
         1->B
     End
     " "->Str7
-    For(C,1,round(A*21/B***REMOVED******REMOVED***
-        (Str7+"="***REMOVED***->Str7
+    For(C,1,round(A*21/B))
+        (Str7+"=")->Str7
     End
     sum(7,4,4,38,0,Str7
     sum(11

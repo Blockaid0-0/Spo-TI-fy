@@ -21,7 +21,7 @@ Start:                             ;main routines
    call PushGUIStack
    call RenderGUI
    call PopGUIStacks
-   bcall(_GetKey***REMOVED***
+   bcall(_GetKey)
    cp $09
    jp z, exit
    jp Start
@@ -31,7 +31,7 @@ mainWindow:
 	.db %01000100
 	.db %01000100
 	.db %11001100
-	.db " Spo(TI***REMOVED***fy",0
+	.db " Spo(TI)fy",0
 mainWindowE:
 exit:
     ret
