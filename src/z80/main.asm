@@ -15,10 +15,10 @@ Init:
    .dw $0000         
 Start:
    ld hl, stringName
-   bcall(_Mov9ToOP1***REMOVED***
-   bcall(_ChkFindSym***REMOVED***
+   bcall(_Mov9ToOP1)
+   bcall(_ChkFindSym)
    JR     C, String
-   bcall(_DelVarArc***REMOVED***
+   bcall(_DelVarArc)
 
    call OpenGUIStack
    ld hl, mainWindow
@@ -43,7 +43,7 @@ Start:
    
    call RenderGUI
    call PopGUIStacks
-   bcall(_GetKey***REMOVED***
+   bcall(_GetKey)
    cp $09
    jp z, exit
    jp Start
@@ -54,7 +54,7 @@ mainWindow:
 	.db %01001000
 	.db %01001000
 	.db %11011000
-	.db " Spo(TI***REMOVED***fy",0
+	.db " Spo(TI)fy",0
 mainWindowE:
 firstText:
 	.db 4
@@ -76,7 +76,7 @@ thirdText:
 thirdTextE:
 String:
    ld hl, stringDataE-stringData
-   bcall(_CreateStrng***REMOVED***
+   bcall(_CreateStrng)
    inc de
    inc de
    ld hl, stringData

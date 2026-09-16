@@ -15,20 +15,20 @@ Init:
    .dw $0000         
 Start:
     ld hl, stringName
-   bcall(_Mov9ToOP1***REMOVED***
-   bcall(_ChkFindSym***REMOVED***
+   bcall(_Mov9ToOP1)
+   bcall(_ChkFindSym)
    JR     C, next
-   bcall(_DelVarArc***REMOVED***
+   bcall(_DelVarArc)
    
 next:
    ld hl, stringDataE-stringData
-   bcall(_CreateStrng***REMOVED***
+   bcall(_CreateStrng)
    inc de
    inc de
    ld hl, stringData
    ld bc, stringDataE-stringData
    ldir
-   bcall(_DispHL***REMOVED***
+   bcall(_DispHL)
    ret
 stringName:
    .db StrngObj,tVarStrng,tStr1,0
