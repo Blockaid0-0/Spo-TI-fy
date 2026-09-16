@@ -1,8 +1,3 @@
-//
-// Created by Blockaid on 8/19/2026.
-//
-
-#pragma once
 #include "include/Globals.h"
 
 uint8_t header[16];
