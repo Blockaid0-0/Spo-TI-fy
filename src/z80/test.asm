@@ -47,11 +47,20 @@ exitB:
 failed:
    .db "FAILED, Press any key to exit",0
 exitG:
+
    bcall(_ClrLCDFull)
    ld a, 0
    ld (CurCol), a
-   ld (CurCol), a
+   ld (CurRow), a
    ld hl, success
+   bcall(_PutS)
+   ld a, 3
+   ld (CurRow), a
+   ld a, 0
+   ld (CurCol), a
+   ld hl, stringName
+   bcall(_Mov9ToOP1)
+   bcall(_FindSym)
    bcall(_PutS)
    bcall(_GetKey)
    ret
