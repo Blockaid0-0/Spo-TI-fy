@@ -40,7 +40,7 @@ Spotify on the TI-84 Plus
 4. #### Add `http://127.0.0.1:8888/callback` to your Redirect URLs
 5. #### Add your ESP32's COM port in the `CONFIG` file
 ## Putting it all together
-1. #### Upload the `exec/SPOTIFY.8xp` file to a TI-84 Plus
+1. #### Upload the `exec/SPOTIFY.8xp` file and [Doors CS 7.4](https://www.cemetech.net/downloads/files/474/x2668) to a TI-84 Plus
 2. #### Create a simple breadboard follwing this design
 ![Breadboard](assets/IMG_1868.jpeg)
 ![Connections](assets/articl_msp432.png)
