@@ -4,7 +4,7 @@ import serial
 from spotipy.oauth2 import SpotifyOAuth
 
 file = open("../../CONFIG")
-comID = file.readlines()[1]
+comID = file.readlines()[1].strip('\n')
 arduino = serial.Serial(port = comID, baudrate=115200, timeout = .1)
 
 def writeRead(x):
@@ -12,8 +12,8 @@ def writeRead(x):
     time.sleep(0.05)
     data = arduino.readline()
     return data
-clientID = file.readlines()[3]
-clientSECRET = file.readlines()[5]
+clientID = file.readlines()[3].strip('\n')
+clientSECRET = file.readlines()[5].strip('\n')
 scope = "user-read-currently-playing"
 
 sp = spotipy.Spotify(
