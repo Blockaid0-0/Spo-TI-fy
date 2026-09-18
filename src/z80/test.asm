@@ -29,7 +29,7 @@ Start:
 stringName:
    .db StrngObj,tVarStrng,tStr1,0
 stringData:
-   .db "STR1",0
+   .db "STR1"
 stringDataE:
 exitB:
    bcall(_ClrLCDFull)
