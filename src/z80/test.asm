@@ -8,6 +8,7 @@ Init:
    xor d
    ret
    jr Start
+   
 
    .dw $0000         
    .db $07,$00       
@@ -17,24 +18,19 @@ Start:
    bcall(_RunIndicOff)
    ld hl, stringName
    bcall(_Mov9ToOP1)
-   bcall(_AppGetCbl)
-   bit comFailed, (iy+getSendFlg)
-   JR nz, exitB
-   jr exitG
-;next:
-;   ld hl, stringDataE-stringData
-;   bcall(_CreateStrng)
-;   inc de
-;   inc de
-;   ld hl, stringData
-;   ld bc, stringDataE-stringData
-;   ldir
-;   ret
+   ld hl, stringDataE-stringData
+   bcall(_CreateStrng)
+   inc de
+   inc de
+   ld hl, stringData
+   ld bc, stringDataE-stringData
+   ldir
+   jr sendNRecLoop
 stringName:
    .db StrngObj,tVarStrng,tStr1,0
-;stringData:
-;   .db "FINALLY"
-;stringDataE:
+stringData:
+   .db "STR1",0
+stringDataE:
 exitB:
    bcall(_ClrLCDFull)
    ld a, 0
@@ -46,8 +42,12 @@ exitB:
    ret
 failed:
    .db "FAILED, Press any key to exit",0
-exitG:
-   
+sendNRecLoop:
+   ld hl, stringName
+   bcall(_Mov9ToOP1)
+   bcall(_SendVarCmd)
+   bit comFailed, (iy+getSendFlg)   
+   JR nz, exitB
    bcall(_ClrLCDFull)
    ld a, 0
    ld (CurCol), a
@@ -61,8 +61,15 @@ exitG:
    ld hl, stringName
    bcall(_Mov9ToOP1)
    bcall(_FindSym)
-   bcall(_PutS)
-   bcall(_GetKey)
-   ret
+   bcall(_formDisp)
+   bcall(_AppGetCbl)
+   bit comFailed, (iy+getSendFlg)
+   JR nz, exitB
+   bcall(_GetCSC)
+   cp kClear
+   jp z, exit
+   jp sendNRecLoop
 success:
    .db "SUCCESS, Press any key to exit",0
+exit:
+   ret
