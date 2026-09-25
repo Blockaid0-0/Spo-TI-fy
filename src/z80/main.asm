@@ -36,6 +36,17 @@ Start:
    ld hl, stringDataTwo
    ld bc, stringDataTwoE-stringDataTwo
    ldir
+
+   ld hl, stringThree
+   bcall(_Mov9ToOP1)
+   ld hl, stringDataThreeE-stringDataThree
+   bcall(_CreateStrng)
+   inc de
+   inc de
+   ld hl, stringDataThree
+   ld bc, stringDataThreeE-stringDataThree
+   ldir
+
    jr RenderLoop
 
 RenderLoop:
@@ -58,9 +69,9 @@ RenderLoop:
    ld hl, stringOne
    bcall(_Mov9ToOP1)
    call LinkRecv
-   jr nz,LinkFailureOne
+   jp nz,LinkFailureOne
    rst rFindSym
-   jr c,LinkFailureOne
+   jp c,LinkFailureOne
    ld bc,TempString-TempStringE
    call SizeTokStr_FromStrng
    ld hl,TempString
@@ -72,7 +83,7 @@ RenderLoop:
    ld hl, stringTwo
    bcall(_Mov9ToOP1)
    call LinkSend
-   jr nz,LinkFailureTwo
+   jp nz,LinkFailureTwo
 
    ld hl, secondText
    ld de, secondTextE-secondText
@@ -93,10 +104,29 @@ RenderLoop:
    ld de, StringSto2
    bcall(_strcopy)
 
+   ld hl, stringThree
+   bcall(_Mov9ToOP1)
+   call LinkSend
+   jr nz,LinkFailureThree
+
    ld hl, thirdText
    ld de, thirdTextE-thirdText
    ld a, GUIRText
    call PushGUIStack
+
+   ld hl, stringThree
+   bcall(_Mov9ToOP1)
+   call LinkRecv
+   jr nz,LinkFailureThree
+   rst rFindSym
+   jr c,LinkFailureThree
+   ld bc,TempString-TempStringE
+   call SizeTokStr_FromStrng
+   ld hl,TempString
+   ex de,hl
+   call ConvTok_FromStrng
+   ld de, StringSto3
+   bcall(_strcopy)
 
    call RenderGUI
    ld b, 4
@@ -107,17 +137,23 @@ RenderLoop:
    jp RenderLoop
 
 LinkFailureOne:
- ld hl,stringOne
- rst rMov9ToOP1
- rst rFindSym
- jr c,LinkFail_NoDelete
- bcall(_DelVarArc)
+   ld hl,stringOne
+   rst rMov9ToOP1
+   rst rFindSym
+   jr c,LinkFail_NoDelete
+   bcall(_DelVarArc)
 LinkFailureTwo:
- ld hl,stringTwo
- rst rMov9ToOP1
- rst rFindSym
- jr c,LinkFail_NoDelete
- bcall(_DelVarArc)
+   ld hl,stringTwo
+   rst rMov9ToOP1
+   rst rFindSym
+   jr c,LinkFail_NoDelete
+   bcall(_DelVarArc)
+LinkFailureThree:
+   ld hl,stringThree
+   rst rMov9ToOP1
+   rst rFindSym
+   jr c,LinkFail_NoDelete
+   bcall(_DelVarArc)
 
 TempString:
    .block 64
@@ -159,7 +195,8 @@ thirdText:
 	.db 4
 	.db 18
 	.db 0
-   .db "Time",0
+StringSto3:
+   .block 64
 thirdTextE:
 ConvTok_FromStrng:
  push de
@@ -328,6 +365,11 @@ stringTwo:
 stringDataTwo:
    .db "STR2"
 stringDataTwoE:
+stringThree:
+   .db StrngObj,tVarStrng,tStr3,0
+stringDataThree:
+   .db "STR3"
+stringDataThreeE:
 
 LinkFailText:
  .db "LINK",tSpace,"FAILED" ; this is actually a string of tokens, not ASCII
