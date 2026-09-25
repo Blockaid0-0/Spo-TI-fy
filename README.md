@@ -2,6 +2,7 @@
 Spotify on the TI-84 Plus
 
 ### TODO: Make better description
+#### [Upcoming features here](https://trello.com/invite/b/6a775f8947624efff6cf8bc8/ATTI86d66a644fbd39037e9389fa5b3325f64B462CF3/spotify)
 
 ## Setup:
 

@@ -5,9 +5,6 @@
    .org progstart
    .db $BB,$6D
 
-TempString:
-   .db 64
-TempStringE:
 
 Init:
    xor d
@@ -19,69 +16,123 @@ Init:
    .dw $0000         
    .dw $0000         
 Start:
+   bcall(_RunIndicOff)
+   ld hl, stringOne
+   bcall(_Mov9ToOP1)
+   ld hl, stringDataOneE-stringDataOne
+   bcall(_CreateStrng)
+   inc de
+   inc de
+   ld hl, stringDataOne
+   ld bc, stringDataOneE-stringDataOne
+   ldir
+
+   ld hl, stringTwo
+   bcall(_Mov9ToOP1)
+   ld hl, stringDataTwoE-stringDataTwo
+   bcall(_CreateStrng)
+   inc de
+   inc de
+   ld hl, stringDataTwo
+   ld bc, stringDataTwoE-stringDataTwo
+   ldir
+   jr RenderLoop
+
+RenderLoop:
    call OpenGUIStack
    ld hl, mainWindow
    ld de, mainWindowE-mainWindow
    ld a, GUIRLargeWin
    call PushGUIStack
 
+   ld hl, stringOne
+   bcall(_Mov9ToOP1)
+   call LinkSend
+   jp nz,LinkFailureOne
+
    ld hl, firstText
    ld de, firstTextE-firstText
    ld a, GUIRText
    call PushGUIStack
+
+   ld hl, stringOne
+   bcall(_Mov9ToOP1)
+   call LinkRecv 
+   jr nz,LinkFailureOne
+   rst rFindSym
+   jr c,LinkFailureOne 
+   ld bc,TempString-TempStringE
+   call SizeTokStr_FromStrng
+   ld hl,TempString
+   ex de,hl
+   call ConvTok_FromStrng
+   ld de, StringSto1
+   bcall(_strcopy)
+
+   ld hl, stringTwo
+   bcall(_Mov9ToOP1)
+   call LinkSend
+   jr nz,LinkFailureTwo
 
    ld hl, secondText
    ld de, secondTextE-secondText
    ld a, GUIRText
    call PushGUIStack
 
+   ld hl, stringTwo
+   bcall(_Mov9ToOP1)
+   call LinkRecv 
+   jr nz,LinkFailureTwo
+   rst rFindSym
+   jr c,LinkFailureTwo 
+   ld bc,TempString-TempStringE
+   call SizeTokStr_FromStrng
+   ld hl,TempString
+   ex de,hl
+   call ConvTok_FromStrng
+   ld de, StringSto2
+   bcall(_strcopy)
+
    ld hl, thirdText
    ld de, thirdTextE-thirdText
    ld a, GUIRText
    call PushGUIStack
-   
+
    call RenderGUI
+   ld b, 4
    call PopGUIStacks
-   bcall(_GetKey)
-   cp $09
+   bcall(_GetCSC)
+   cp skClear
    jp z, exit
-   jp Start
-NoDelete:
- ld hl,stringName
- rst rMov9ToOP1
- rst rFindSym
- jr c,NoStrDelete1
- bcall(_DelVarArc)
-NoStrDelete1:
- call LinkRecv 
- jr nz,LinkFailure
- rst rFindSym
- jr c,LinkFailure 
- ld bc,TempString-TempStringE
- call SizeTokStr_FromStrng
- jr c,LinkFailure
- ld hl,TempString
- ex de,hl
- call ConvTok_FromStrng 
- ld a, 3
- ld (curRow), a
- ld (hlStorage), hl
- ret
-LinkFailure:
- ld hl,stringName
+   jp RenderLoop
+
+LinkFailureOne:
+ ld hl,stringOne
  rst rMov9ToOP1
  rst rFindSym  
  jr c,LinkFail_NoDelete
  bcall(_DelVarArc)
+LinkFailureTwo:
+ ld hl,stringTwo
+ rst rMov9ToOP1
+ rst rFindSym  
+ jr c,LinkFail_NoDelete
+ bcall(_DelVarArc)
+
+TempString:
+   .block 64
+TempStringE:
+
 LinkFail_NoDelete:
  ld hl,11
  push hl
  bcall(_CreateStrng)
  inc de
  inc de
- ld hl,LinkFailText
+ ld hl,exit
  pop bc
  ldir
+
 mainWindow:
 	.db %01111000
 	.db %01001000
@@ -94,23 +145,22 @@ firstText:
 	.db 4
 	.db 2
 	.db 0
-	.db "Song",0
+StringSto1:
+   .block 64
 firstTextE:
-
 secondText:
 	.db 4
 	.db 10
 	.db 0
-	.db "Artist",0
+StringSto2:
+   .block 64
 secondTextE:
 thirdText:
 	.db 4
 	.db 18
 	.db 0
-hlStorage:
-   .dw 0
+   .db "Time",0
 thirdTextE:
-
 ConvTok_FromStrng:
  push de
  ld c,(hl)
@@ -264,8 +314,21 @@ LinkRecv:
  bcall(_AppGetCBL) ; request Str1 (from OP1) from the attached CBL2/LabPro
  bit ComFailed, (iy+getSendFlg) ; getSendFlg.ComFailed set if failed
  ret
-stringName:
+LinkSend:
+ bcall(_SendVarCmd) ; try to send list from OP1
+ bit ComFailed, (iy+getSendFlg) ; getSendFlg.ComFailed set if failed
+ ret
+stringOne:
    .db StrngObj,tVarStrng,tStr1,0
+stringDataOne:
+   .db "STR1"
+stringDataOneE:
+stringTwo:
+   .db StrngObj,tVarStrng,tStr2,0
+stringDataTwo:
+   .db "STR2"
+stringDataTwoE:
+
 LinkFailText:
  .db "LINK",tSpace,"FAILED" ; this is actually a string of tokens, not ASCII
 exit:
