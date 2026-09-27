@@ -9,7 +9,7 @@
 Init:
    xor d
    ret
-   jr Start
+   jp Start
 
    .dw $0000         
    .db $07,$00       
@@ -17,7 +17,7 @@ Init:
    .dw $0000         
 Start:
    bcall(_RunIndicOff)
-   jr TestStr1
+   jp TestStr1
 
 TestStr1:
    ld hl, stringOne
@@ -75,6 +75,28 @@ MakeStr3:
    ld hl, stringDataThree
    ld bc, stringDataThreeE-stringDataThree
    ldir
+   jp MakeA
+MakeA:
+   ld hl, RealA
+   bcall(_Mov9ToOP1)
+   ld hl, RealADataE-RealAData
+   bcall(_CreateReal)
+   inc de
+   inc de
+   ld hl, RealAData
+   ld bc, RealADataE-RealAData
+   ldir
+   jp MakeB
+MakeB:
+   ld hl, RealB
+   bcall(_Mov9ToOP1)
+   ld hl, RealBDataE-RealBData
+   bcall(_CreateReal)
+   inc de
+   inc de
+   ld hl, RealBData
+   ld bc, RealBDataE-RealBData
+   ldir
    jp RenderLoop
 
 RenderLoop:
@@ -121,9 +143,9 @@ RenderLoop:
    ld hl, stringTwo
    bcall(_Mov9ToOP1)
    call LinkRecv
-   jr nz,LinkFailureTwo
+   jp nz,LinkFailureTwo
    rst rFindSym
-   jr c,LinkFailureTwo
+   jp c,LinkFailureTwo
    ld bc,TempString-TempStringE
    call SizeTokStr_FromStrng
    ld hl,TempString
@@ -135,7 +157,7 @@ RenderLoop:
    ld hl, stringThree
    bcall(_Mov9ToOP1)
    call LinkSend
-   jr nz,LinkFailureThree
+   jp nz,LinkFailureThree
 
    ld hl, thirdText
    ld de, thirdTextE-thirdText
@@ -145,16 +167,34 @@ RenderLoop:
    ld hl, stringThree
    bcall(_Mov9ToOP1)
    call LinkRecv
-   jr nz,LinkFailureThree
+   jp nz,LinkFailureThree
    rst rFindSym
-   jr c,LinkFailureThree
+   jp c,LinkFailureThree
    ld bc,TempString-TempStringE
    call SizeTokStr_FromStrng
    ld hl,TempString
    ex de,hl
+
    call ConvTok_FromStrng
    ld de, StringSto3
    bcall(_strcopy)
+
+   ld hl, barBorder
+   ld de, barBorderE-barBorder
+   ld a, GUIRBorder
+   call PushGUIStack
+
+   call barMath
+   ld de, barCompleted
+   bcall(_strcopy)
+
+   ld hl, barLine
+   ld de, barLineE-barLine
+   ld a, GUIRRect
+   call PushGUIStack
+
+   call RenderGUI
+   ld b, 6
 
    call RenderGUI
    ld b, 4
@@ -170,26 +210,38 @@ LinkFailureOne:
    ld hl,stringOne
    rst rMov9ToOP1
    rst rFindSym
-   jr c,LinkFail_NoDelete
+   jp c,LinkFail_NoDeleteStr
    bcall(_DelVarArc)
 LinkFailureTwo:
    ld hl,stringTwo
    rst rMov9ToOP1
    rst rFindSym
-   jr c,LinkFail_NoDelete
+   jp c,LinkFail_NoDeleteStr
    bcall(_DelVarArc)
 LinkFailureThree:
    ld hl,stringThree
    rst rMov9ToOP1
    rst rFindSym
-   jr c,LinkFail_NoDelete
+   jp c,LinkFail_NoDeleteStr
+   bcall(_DelVarArc)
+LinkFailureA:
+   ld hl,RealA
+   rst rMov9ToOP1
+   rst rFindSym
+   jp c,LinkFail_NoDeleteReal
+   bcall(_DelVarArc)
+LinkFailureB:
+   ld hl,RealB
+   rst rMov9ToOP1
+   rst rFindSym
+   jp c,LinkFail_NoDeleteReal
    bcall(_DelVarArc)
 
 TempString:
    .block 64
 TempStringE:
 
-LinkFail_NoDelete:
+LinkFail_NoDeleteStr:
    ld hl,11
    push hl
    bcall(_CreateStrng)
@@ -198,6 +250,57 @@ LinkFail_NoDelete:
    ld hl,exit
    pop bc
    ldir
+LinkFail_NoDeleteReal:
+   ld hl,11
+   push hl
+   bcall(_CreateReal)
+   inc de
+   inc de
+   ld hl,exit
+   pop bc
+   ldir
+barMath:
+   ld hl, RealA
+   bcall(_Mov9ToOP1)
+   call LinkSend
+   jp nz,LinkFailureA
+   
+   ld hl, RealA
+   bcall(_Mov9ToOP1)
+   call LinkRecv
+   jp nz,LinkFailureA
+
+   ld hl, RealB
+   bcall(_Mov9ToOP1)
+   call LinkSend
+   jp nz,LinkFailureB
+
+   ld hl, RealB
+   bcall(_Mov9ToOP2)
+   call LinkRecv
+   jp nz,LinkFailureB
+
+   ld hl, RealA
+   bcall(_Mov9ToOP1)
+   bcall(_RclVarSym)
+
+   ld hl, RealB
+   bcall(_Mov9ToOP2)
+   bcall(_RclVarSym)
+   bcall(_OP1ExOP2)
+
+   bcall(_fpdiv)
+
+   ld de, 2
+   bcall(_Round)
+
+   ld a, 84
+   bcall(_OP2SetA)
+   bcall(_FPMult)
+
+   bcall(_ConvOP1)
+   ex de, hl
+   ret
 
 mainWindow:
 	.db %01111000
@@ -228,7 +331,21 @@ thirdText:
 StringSto3:
    .block 64
 thirdTextE:
-
+barBorder:
+  .db 4
+  .db 38
+  .db 85
+  .db 4
+  .db $FF
+barBorderE:
+barLine:
+  .db 5
+  .db 39
+barCompleted:
+  .block 1
+  .db 3
+  .db $FD
+barLineE:
 ConvTok_FromStrng:
    push de
    ld c,(hl)
@@ -238,7 +355,7 @@ ConvTok_FromStrng:
 ConvTok_FromStrng_Loop:
    ld a,c
    or b
-   jr z,ConvTok_FromStrng_Exit
+   jp z,ConvTok_FromStrng_Exit
    push bc
    push hl
    push de
@@ -250,13 +367,13 @@ ConvTok_FromStrng_Loop:
    ld a,(hl)
    bcall(_isA2ByteTok)
    pop bc
-   jr nz,ConvTok_FromStrng_OneByte
+   jp nz,ConvTok_FromStrng_OneByte
    dec bc
    inc hl
 ConvTok_FromStrng_OneByte:
    inc hl
    dec bc
-   jr ConvTok_FromStrng_Loop
+   jp ConvTok_FromStrng_Loop
 ConvTok_FromStrng_Exit:
    xor a
    ld (de),a
@@ -274,13 +391,13 @@ Minus:
    pop hl
    ld a,(hl)
    bcall(_isA2ByteTok)
-   jr nz,ConvTok_OneByte
+   jp nz,ConvTok_OneByte
    inc hl
 ConvTok_OneByte:
    inc hl
    ld a,(hl)
    or a
-   jr nz,Minus
+   jp nz,Minus
    xor a
    ld (de),a
    ex de,hl
@@ -295,9 +412,9 @@ SizeTokStr:
 SizeTokStr_Loop:
    ld a,(de) ; put byte we're pointing to in accumulator
    or a ; set flags, we look for zero flag
-   jr z,SizeTokStr_SizeCompare ; if we find (de)==0, we're done
+   jp z,SizeTokStr_SizeCompare ; if we find (de)==0, we're done
    call SizeTokStr_Count ; bc += len((de)), de += len(token)
-   jr SizeTokStr_Loop ; move on to the next token
+   jp SizeTokStr_Loop ; move on to the next token
 SizeTokStr_SizeCompare:
    ; grab original memory size in hl, bc to de, return CpHLDE
    pop hl ; we need our memory size we pushed to stack way back at the start
@@ -331,11 +448,11 @@ SizeTokStr_FromStrng_Loop:
    xor a ; zero out accumulator
    ld a,l ; get l into accumulator
    or h ; superimpose h onto accumulator and set flags
-   jr z,SizeTokStr_SizeCompare ; length has reached zero, exit
+   jp z,SizeTokStr_SizeCompare ; length has reached zero, exit
    ; otherwise, Str1 contains unconverted tokens
    call SizeTokStr_Count ; bc += len((de)), de += len(token)
    dec hl
-   jr SizeTokStr_FromStrng_Loop ; move on to the next token
+   jp SizeTokStr_FromStrng_Loop ; move on to the next token
    ; when loop completes, hl == 0, (de) == end of string, bc == length of tokens,
    ; and (sp) == memory size pushed to stack at beginning
    ; this is the same exit condition as ConvTok_SizeCheck, so we reuse its code
@@ -357,7 +474,7 @@ SizeTokStr_Count:
    ; if it's a 1-byte token, d must be 0 and e contains the token
    ld d,0
    ld e,a
-   jr nz,SizeTokStr_Count_OneByte
+   jp nz,SizeTokStr_Count_OneByte
    ld d,e
    inc hl
    ld e,(hl)
@@ -386,6 +503,7 @@ LinkSend:
    bcall(_SendVarCmd) ; try to send list from OP1
    bit ComFailed, (iy+getSendFlg) ; getSendFlg.ComFailed set if failed
    ret
+
 stringOne:
    .db StrngObj,tVarStrng,tStr1,0
 stringDataOne:
@@ -401,6 +519,16 @@ stringThree:
 stringDataThree:
    .db "STR3"
 stringDataThreeE:
+RealA:
+   .db RealObj,"A",0
+RealAData:
+   .db 0
+RealADataE:
+RealB:
+   .db RealObj,"B",0
+RealBData:
+   .db 1
+RealBDataE:
 
 LinkFailText:
  .db "LINK",tSpace,"FAILED" ; this is actually a string of tokens, not ASCII
