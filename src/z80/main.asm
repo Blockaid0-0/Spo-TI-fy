@@ -5,7 +5,6 @@
    .org progstart
    .db $BB,$6D
 
-
 Init:
    xor d
    ret
@@ -42,6 +41,20 @@ TestStr3:
    jp C, MakeStr3
    bcall(_DelVarArc)
    jp TestStr3
+TestA:
+   ld hl, RealA
+   bcall(_Mov9ToOP1)
+   bcall(_ChkFindSym)
+   jp C, MakeA
+   bcall(_DelVarArc)
+   jp TestA
+TestB:
+   ld hl, TestB
+   bcall(_Mov9ToOP1)
+   bcall(_ChkFindSym)
+   jp C, MakeB
+   bcall(_DelVarArc)
+   jp TestB
 
 MakeStr1:
    ld hl, stringOne
@@ -75,7 +88,7 @@ MakeStr3:
    ld hl, stringDataThree
    ld bc, stringDataThreeE-stringDataThree
    ldir
-   jp MakeA
+   jp TestA
 MakeA:
    ld hl, RealA
    bcall(_Mov9ToOP1)
@@ -86,7 +99,7 @@ MakeA:
    ld hl, RealAData
    ld bc, RealADataE-RealAData
    ldir
-   jp MakeB
+   jp TestB
 MakeB:
    ld hl, RealB
    bcall(_Mov9ToOP1)
@@ -247,7 +260,7 @@ LinkFail_NoDeleteStr:
    bcall(_CreateStrng)
    inc de
    inc de
-   ld hl,exit
+   ld hl,exitFailed
    pop bc
    ldir
 LinkFail_NoDeleteReal:
@@ -256,7 +269,7 @@ LinkFail_NoDeleteReal:
    bcall(_CreateReal)
    inc de
    inc de
-   ld hl,exit
+   ld hl,exitFailed
    pop bc
    ldir
 barMath:
@@ -276,19 +289,23 @@ barMath:
    jp nz,LinkFailureB
 
    ld hl, RealB
-   bcall(_Mov9ToOP2)
+   bcall(_Mov9ToOP1)
    call LinkRecv
    jp nz,LinkFailureB
+
+   ld hl, RealB
+   bcall(_Mov9ToOP1)
+   bcall(_RclVarSym)
+   bcall(_ConvOP1)
+   ld a, (de)
+   cp 0
+   call nc, setOp2
+   bcall(_OP1ToOP2)
 
    ld hl, RealA
    bcall(_Mov9ToOP1)
    bcall(_RclVarSym)
-
-   ld hl, RealB
-   bcall(_Mov9ToOP2)
-   bcall(_RclVarSym)
-   bcall(_OP1ExOP2)
-
+   
    bcall(_fpdiv)
 
    ld de, 2
@@ -298,10 +315,15 @@ barMath:
    bcall(_OP2SetA)
    bcall(_FPMult)
 
+   bcall(_int)
+
    bcall(_ConvOP1)
    ex de, hl
    ret
 
+setOp2:
+   bcall(_OP1Set1)
+   ret
 mainWindow:
 	.db %01111000
 	.db %01001000
@@ -344,7 +366,7 @@ barLine:
 barCompleted:
   .block 1
   .db 3
-  .db $FD
+  .db $FE
 barLineE:
 ConvTok_FromStrng:
    push de
@@ -522,16 +544,25 @@ stringDataThreeE:
 RealA:
    .db RealObj,"A",0
 RealAData:
-   .db 0
+   .db t0
 RealADataE:
 RealB:
    .db RealObj,"B",0
 RealBData:
-   .db 1
+   .db t1
 RealBDataE:
 
 LinkFailText:
- .db "LINK",tSpace,"FAILED" ; this is actually a string of tokens, not ASCII
+ .db "LINK FAILED",0 ; this is actually a string of tokens, not ASCII
+exitFailed:
+   call CloseGUIStack
+   bcall(_ClrLCDFull)
+   ld a, 0
+   ld (CurRow), a
+   ld (CurCol), a
+   ld hl, LinkFailText
+   bcall(_PutS)
+   ret
 exit:
    call CloseGUIStack
    ret
