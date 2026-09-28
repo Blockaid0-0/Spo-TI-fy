@@ -198,8 +198,8 @@ RenderLoop:
    call PushGUIStack
 
    call barMath
-   ld de, barCompleted
-   bcall(_strcopy)
+   ld a, l
+   ld (barCompleted), a 
 
    ld hl, barLine
    ld de, barLineE-barLine
@@ -296,10 +296,7 @@ barMath:
    ld hl, RealB
    bcall(_Mov9ToOP1)
    bcall(_RclVarSym)
-   bcall(_ConvOP1)
-   ld a, (de)
-   cp 0
-   call nc, setOp2
+
    bcall(_OP1ToOP2)
 
    ld hl, RealA
@@ -544,12 +541,12 @@ stringDataThreeE:
 RealA:
    .db RealObj,"A",0
 RealAData:
-   .db t0
+   .db $00
 RealADataE:
 RealB:
    .db RealObj,"B",0
 RealBData:
-   .db t1
+   .db $01
 RealBDataE:
 
 LinkFailText:
