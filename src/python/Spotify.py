@@ -31,7 +31,7 @@ while True:
     line = arduino.readline().decode(errors="ignore").strip()
     spot = sp.currently_playing()
     if spot is None or spot.get("item") == False:
-        vals = "Not playing|No one|00:00/00:00|0|0"
+        vals = "Not playing|No one|00:00/00:00|0|1"
         if line == "PLAY":
             sp.start_playback()
     else:
@@ -68,7 +68,7 @@ while True:
         song = song[:26]
         artist = artist[:26]
 
-        status = "1" if isPlaying else "0"
+        status = 2 if isPlaying else 1
 
         vals = f'''{song}|{artist}|{timeElapsed}|{elapsePer}|{status}'''
 

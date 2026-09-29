@@ -42,14 +42,14 @@ int requestStr(uint8_t type, enum Endpoint model, int* headerLen, int* dataLen, 
             sendStr[3] = text;
             rVal = TIVar::longToReal8x(num, data, model);
             break;
-        /*case 5: header[4] = 0x00;
+        case 5: header[4] = 0x00;
             header[3] = 'B';
             text = mesg[4];
             header[2] = VarTypes82::VarReal;
             num = text.toInt();
             sendStr[4] = text;
             rVal = TIVar::longToReal8x(num, data, model);
-            break;*/
+            break;
         default: header[4] = 0x00;
             header[3] = 0xAA;
             header[2] = VarTypes82::VarString;
@@ -74,7 +74,7 @@ int recieveStr(uint8_t type, enum Endpoint model, int dataLen) {
     else if (mainStr == "STR2" || mainStr == sendStr[1]) strVar = 2;
     else if (mainStr == "STR3" || mainStr == sendStr[2]) strVar = 3;
     else if (mainNum == 0 || mainNum == sendStr[3].toInt()) strVar = 4;
-    //else if (mainNum == 1 || mainNum == sendStr[4].toInt()) strVar = 5;
+    else if (mainNum == 1 || mainNum == sendStr[4].toInt()) strVar = 5;
     return 0;
 }
 
