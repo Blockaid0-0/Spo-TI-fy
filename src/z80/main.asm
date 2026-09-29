@@ -41,6 +41,7 @@ TestStr3:
    jp C, MakeStr3
    bcall(_DelVarArc)
    jp TestStr3
+   
 TestA:
    ld hl, RealA
    bcall(_Mov9ToOP1)
@@ -48,13 +49,13 @@ TestA:
    jp C, MakeA
    bcall(_DelVarArc)
    jp TestA
-TestB:
-   ld hl, TestB
-   bcall(_Mov9ToOP1)
-   bcall(_ChkFindSym)
-   jp C, MakeB
-   bcall(_DelVarArc)
-   jp TestB
+;TestB:
+;   ld hl, TestB
+;   bcall(_Mov9ToOP1)
+;   bcall(_ChkFindSym)
+;   jp C, MakeB
+;   bcall(_DelVarArc)
+;   jp TestB
 
 MakeStr1:
    ld hl, stringOne
@@ -99,18 +100,18 @@ MakeA:
    ld hl, RealAData
    ld bc, RealADataE-RealAData
    ldir
-   jp TestB
-MakeB:
-   ld hl, RealB
-   bcall(_Mov9ToOP1)
-   ld hl, RealBDataE-RealBData
-   bcall(_CreateReal)
-   inc de
-   inc de
-   ld hl, RealBData
-   ld bc, RealBDataE-RealBData
-   ldir
    jp RenderLoop
+;MakeB:
+;   ld hl, RealB
+;   bcall(_Mov9ToOP1)
+;   ld hl, RealBDataE-RealBData
+;   bcall(_CreateReal)
+;   inc de
+;   inc de
+;   ld hl, RealBData
+;   ld bc, RealBDataE-RealBData
+;   ldir
+;   jp RenderLoop
 
 RenderLoop:
    call OpenGUIStack
@@ -198,7 +199,9 @@ RenderLoop:
    call PushGUIStack
 
    call barMath
-   ld a, l
+   ld a, e
+   cp 0
+   call z, fixBar
    ld (barCompleted), a 
 
    ld hl, barLine
@@ -208,9 +211,6 @@ RenderLoop:
 
    call RenderGUI
    ld b, 6
-
-   call RenderGUI
-   ld b, 4
    call PopGUIStacks
 
    bcall(_GetCSC)
@@ -243,12 +243,12 @@ LinkFailureA:
    rst rFindSym
    jp c,LinkFail_NoDeleteReal
    bcall(_DelVarArc)
-LinkFailureB:
-   ld hl,RealB
-   rst rMov9ToOP1
-   rst rFindSym
-   jp c,LinkFail_NoDeleteReal
-   bcall(_DelVarArc)
+;LinkFailureB:
+;   ld hl,RealB
+;   rst rMov9ToOP1
+;   rst rFindSym
+;   jp c,LinkFail_NoDeleteReal
+;   bcall(_DelVarArc)
 
 TempString:
    .block 64
@@ -283,30 +283,13 @@ barMath:
    call LinkRecv
    jp nz,LinkFailureA
 
-   ld hl, RealB
-   bcall(_Mov9ToOP1)
-   call LinkSend
-   jp nz,LinkFailureB
-
-   ld hl, RealB
-   bcall(_Mov9ToOP1)
-   call LinkRecv
-   jp nz,LinkFailureB
-
-   ld hl, RealB
-   bcall(_Mov9ToOP1)
-   bcall(_RclVarSym)
-
-   bcall(_OP1ToOP2)
-
    ld hl, RealA
    bcall(_Mov9ToOP1)
    bcall(_RclVarSym)
-   
-   bcall(_fpdiv)
 
-   ld de, 2
-   bcall(_Round)
+   ld a, 100
+   bcall(_OP2SetA)
+   bcall(_fpdiv)
 
    ld a, 84
    bcall(_OP2SetA)
@@ -315,11 +298,10 @@ barMath:
    bcall(_int)
 
    bcall(_ConvOP1)
-   ex de, hl
    ret
 
-setOp2:
-   bcall(_OP1Set1)
+fixBar:
+   ld a, 1
    ret
 mainWindow:
 	.db %01111000
@@ -543,11 +525,11 @@ RealA:
 RealAData:
    .db $00
 RealADataE:
-RealB:
-   .db RealObj,"B",0
-RealBData:
-   .db $01
-RealBDataE:
+;RealB:
+;   .db RealObj,"B",0
+;RealBData:
+;   .db $01
+;RealBDataE:
 
 LinkFailText:
  .db "LINK FAILED",0 ; this is actually a string of tokens, not ASCII

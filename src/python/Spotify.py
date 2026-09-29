@@ -31,7 +31,7 @@ while True:
     line = arduino.readline().decode(errors="ignore").strip()
     spot = sp.currently_playing()
     if spot is None or spot['is_playing'] == False:
-        vals = "Not playing|No one|00:00/00:00|0|1"
+        vals = "Not playing|No one|00:00/00:00|0"
         if line == "PLAY":
             sp.start_playback()
     else:
@@ -48,10 +48,12 @@ while True:
         durationSec = spot["item"]["duration_ms"] // 1000
         duration = "%02d:%02d" %(durationSec // 60,durationSec % 60)
         timeElapsed = f'{progress}/{duration}'
+        elapsedSec = progressSec/durationSec
+        elapsedSec = int(elapsedSec * 100)
         if len(song) > 26:
             song = f"{song[:26]}"
         if len(artist) > 26:
             artist = f"{artist[:26]}"
-        vals = f'''{song}|{artist}|{timeElapsed}|{progressSec}|{durationSec}'''
+        vals = f'''{song}|{artist}|{timeElapsed}|{elapsedSec}'''
     print(vals.strip())
     writeRead(vals.strip())
