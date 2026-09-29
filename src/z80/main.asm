@@ -49,6 +49,13 @@ TestA:
    jp C, MakeA
    bcall(_DelVarArc)
    jp TestA
+;TestB:
+;   ld hl, TestB
+;   bcall(_Mov9ToOP1)
+;   bcall(_ChkFindSym)
+;   jp C, MakeB
+;   bcall(_DelVarArc)
+;   jp TestB
 
 MakeStr1:
    ld hl, stringOne
@@ -94,6 +101,17 @@ MakeA:
    ld bc, RealADataE-RealAData
    ldir
    jp RenderLoop
+;MakeB:
+;   ld hl, RealB
+;   bcall(_Mov9ToOP1)
+;   ld hl, RealBDataE-RealBData
+;   bcall(_CreateReal)
+;   inc de
+;   inc de
+;   ld hl, RealBData
+;   ld bc, RealBDataE-RealBData
+;   ldir
+;   jp RenderLoop
 
 RenderLoop:
    call OpenGUIStack
@@ -184,7 +202,7 @@ RenderLoop:
    ld a, e
    cp 0
    call z, fixBar
-   ld (barCompleted), a
+   ld (barCompleted), a 
 
    ld hl, barLine
    ld de, barLineE-barLine
@@ -225,6 +243,12 @@ LinkFailureA:
    rst rFindSym
    jp c,LinkFail_NoDeleteReal
    bcall(_DelVarArc)
+;LinkFailureB:
+;   ld hl,RealB
+;   rst rMov9ToOP1
+;   rst rFindSym
+;   jp c,LinkFail_NoDeleteReal
+;   bcall(_DelVarArc)
 
 TempString:
    .block 64
@@ -501,6 +525,11 @@ RealA:
 RealAData:
    .db $00
 RealADataE:
+;RealB:
+;   .db RealObj,"B",0
+;RealBData:
+;   .db $01
+;RealBDataE:
 
 LinkFailText:
  .db "LINK FAILED",0 ; this is actually a string of tokens, not ASCII
