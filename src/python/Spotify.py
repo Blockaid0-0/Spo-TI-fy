@@ -30,30 +30,47 @@ sp = spotipy.Spotify(
 while True:
     line = arduino.readline().decode(errors="ignore").strip()
     spot = sp.currently_playing()
-    if spot is None or spot['is_playing'] == False:
-        vals = "Not playing|No one|00:00/00:00|0"
+    if spot is None or spot.get("item") == False:
+        vals = "Not playing|No one|00:00/00:00|0|0"
         if line == "PLAY":
             sp.start_playback()
     else:
+        isPlaying = spot.get("is_playing", False)
+
         if line == "PLAY":
-            sp.pause_playback()
+            if isPlaying:
+                sp.pause_playback()
+            else:
+                sp.start_playback()
+
         if line == "SKIP":
             sp.next_track()
+
         if line == "REPLAY":
             sp.previous_track()
+
         song = spot["item"]["name"]
         artist = spot["item"]["artists"][0]["name"]
-        progressSec = spot["progress_ms"] // 1000
-        progress = "%02d:%02d" % (progressSec // 60,progressSec % 60)
+
+        progressSec = spot.get("progress_ms", 0) // 1000
         durationSec = spot["item"]["duration_ms"] // 1000
+
+        progress = "%02d:%02d" % (progressSec // 60, progressSec % 60)
         duration = "%02d:%02d" %(durationSec // 60,durationSec % 60)
+
         timeElapsed = f'{progress}/{duration}'
-        elapsedSec = progressSec/durationSec
-        elapsedSec = int(elapsedSec * 100)
-        if len(song) > 26:
-            song = f"{song[:26]}"
-        if len(artist) > 26:
-            artist = f"{artist[:26]}"
-        vals = f'''{song}|{artist}|{timeElapsed}|{elapsedSec}'''
+
+        if durationSec > 0:
+            elapsePer = int((progressSec/durationSec) * 100)
+        else:
+            elapsePer = 0
+
+        song = song[:26]
+        artist = artist[:26]
+
+        status = "1" if isPlaying else "0"
+
+        vals = f'''{song}|{artist}|{timeElapsed}|{elapsePer}|{status}'''
+
     print(vals.strip())
     writeRead(vals.strip())
