@@ -20,7 +20,7 @@ Start:
 
 TestStr1:
    ld hl, stringOne
-   bcall(_Mov9ToOP1)
+   rst rMOV9TOOP1
    bcall(_ChkFindSym)
    jp C, MakeStr1
    bcall(_DelVarArc)
@@ -28,7 +28,7 @@ TestStr1:
 
 TestStr2:
    ld hl, stringTwo
-   bcall(_Mov9ToOP1)
+   rst rMOV9TOOP1
    bcall(_ChkFindSym)
    jp C, MakeStr2
    bcall(_DelVarArc)
@@ -36,23 +36,30 @@ TestStr2:
 
 TestStr3:
    ld hl, stringThree
-   bcall(_Mov9ToOP1)
+   rst rMOV9TOOP1
    bcall(_ChkFindSym)
    jp C, MakeStr3
    bcall(_DelVarArc)
    jp TestStr3
-
+   
 TestA:
    ld hl, RealA
-   bcall(_Mov9ToOP1)
+   rst rMOV9TOOP1
    bcall(_ChkFindSym)
    jp C, MakeA
    bcall(_DelVarArc)
    jp TestA
+TestB:
+   ld hl, TestB
+   rst rMOV9TOOP1
+   bcall(_ChkFindSym)
+   jp C, MakeB
+   bcall(_DelVarArc)
+   jp TestB
 
 MakeStr1:
    ld hl, stringOne
-   bcall(_Mov9ToOP1)
+   rst rMOV9TOOP1
    ld hl, stringDataOneE-stringDataOne
    bcall(_CreateStrng)
    inc de
@@ -63,7 +70,7 @@ MakeStr1:
    jp TestStr2
 MakeStr2:
    ld hl, stringTwo
-   bcall(_Mov9ToOP1)
+   rst rMOV9TOOP1
    ld hl, stringDataTwoE-stringDataTwo
    bcall(_CreateStrng)
    inc de
@@ -74,7 +81,7 @@ MakeStr2:
    jp TestStr3
 MakeStr3:
    ld hl, stringThree
-   bcall(_Mov9ToOP1)
+   rst rMOV9TOOP1
    ld hl, stringDataThreeE-stringDataThree
    bcall(_CreateStrng)
    inc de
@@ -85,13 +92,24 @@ MakeStr3:
    jp TestA
 MakeA:
    ld hl, RealA
-   bcall(_Mov9ToOP1)
+   rst rMOV9TOOP1
    ld hl, RealADataE-RealAData
    bcall(_CreateReal)
    inc de
    inc de
    ld hl, RealAData
    ld bc, RealADataE-RealAData
+   ldir
+   jp TestB
+MakeB:
+   ld hl, RealB
+   rst rMOV9TOOP1
+   ld hl, RealBDataE-RealBData
+   bcall(_CreateReal)
+   inc de
+   inc de
+   ld hl, RealBData
+   ld bc, RealBDataE-RealBData
    ldir
    jp RenderLoop
 
@@ -103,7 +121,7 @@ RenderLoop:
    call PushGUIStack
 
    ld hl, stringOne
-   bcall(_Mov9ToOP1)
+   rst rMOV9TOOP1
    call LinkSend
    jp nz,LinkFailureOne
 
@@ -113,7 +131,7 @@ RenderLoop:
    call PushGUIStack
 
    ld hl, stringOne
-   bcall(_Mov9ToOP1)
+   rst rMOV9TOOP1
    call LinkRecv
    jp nz,LinkFailureOne
    rst rFindSym
@@ -127,7 +145,7 @@ RenderLoop:
    bcall(_strcopy)
 
    ld hl, stringTwo
-   bcall(_Mov9ToOP1)
+   rst rMOV9TOOP1
    call LinkSend
    jp nz,LinkFailureTwo
 
@@ -137,7 +155,7 @@ RenderLoop:
    call PushGUIStack
 
    ld hl, stringTwo
-   bcall(_Mov9ToOP1)
+   rst rMOV9TOOP1
    call LinkRecv
    jp nz,LinkFailureTwo
    rst rFindSym
@@ -151,7 +169,7 @@ RenderLoop:
    bcall(_strcopy)
 
    ld hl, stringThree
-   bcall(_Mov9ToOP1)
+   rst rMOV9TOOP1
    call LinkSend
    jp nz,LinkFailureThree
 
@@ -161,7 +179,7 @@ RenderLoop:
    call PushGUIStack
 
    ld hl, stringThree
-   bcall(_Mov9ToOP1)
+   rst rMOV9TOOP1
    call LinkRecv
    jp nz,LinkFailureThree
    rst rFindSym
@@ -184,11 +202,28 @@ RenderLoop:
    ld a, e
    cp 0
    call z, fixBar
-   ld (barCompleted), a
+   ld (barCompleted), a 
 
    ld hl, barLine
    ld de, barLineE-barLine
    ld a, GUIRRect
+   call PushGUIStack
+
+   ld hl, RealB
+   rst rMOV9TOOP1
+   call LinkSend
+   jp nz,LinkFailureB
+
+   ld hl, RealB
+   rst rMOV9TOOP1
+   call LinkRecv
+   jp nz,LinkFailureB
+
+   call detectPlay
+
+   ld hl, playingInd
+   ld de, playingIndE-playingInd
+   ld a, GUIRSprite
    call PushGUIStack
 
    call RenderGUI
@@ -225,6 +260,12 @@ LinkFailureA:
    rst rFindSym
    jp c,LinkFail_NoDeleteReal
    bcall(_DelVarArc)
+LinkFailureB:
+   ld hl,RealB
+   rst rMov9ToOP1
+   rst rFindSym
+   jp c,LinkFail_NoDeleteReal
+   bcall(_DelVarArc)
 
 TempString:
    .block 64
@@ -250,17 +291,17 @@ LinkFail_NoDeleteReal:
    ldir
 barMath:
    ld hl, RealA
-   bcall(_Mov9ToOP1)
+   rst rMOV9TOOP1
    call LinkSend
    jp nz,LinkFailureA
    
    ld hl, RealA
-   bcall(_Mov9ToOP1)
+   rst rMOV9TOOP1
    call LinkRecv
    jp nz,LinkFailureA
 
    ld hl, RealA
-   bcall(_Mov9ToOP1)
+   rst rMOV9TOOP1
    bcall(_RclVarSym)
 
    ld a, 100
@@ -278,6 +319,28 @@ barMath:
 
 fixBar:
    ld a, 1
+   ret
+detectPlay:
+   ld hl, RealB
+   rst rMOV9TOOP1
+   bcall(_RclVarSym)
+   bcall(_ConvOP1)
+   ld a, e
+   or a
+   jp z, loadPause
+   jp loadPlay
+   ret
+loadPause:
+   ld hl, Paused
+   ld de, playingMode
+   ld bc, 5
+   ldir
+   ret
+loadPlay:
+   ld hl, Playing
+   ld de, playingMode
+   ld bc, 5
+   ldir
    ret
 mainWindow:
 	.db %01111000
@@ -323,6 +386,27 @@ barCompleted:
   .db 3
   .db $FE
 barLineE:
+playingInd:
+   .db 42
+   .db 46
+   .db 5
+playingMode:
+   .block 5
+playingIndE:
+
+Paused:
+   .db %00110000
+	.db %00111000
+	.db %00111100
+	.db %00111000
+	.db %00110000
+Playing:
+   .db %01100110
+	.db %01100110
+	.db %01100110
+	.db %01100110
+	.db %01100110
+
 ConvTok_FromStrng:
    push de
    ld c,(hl)
@@ -499,8 +583,13 @@ stringDataThreeE:
 RealA:
    .db RealObj,"A",0
 RealAData:
-   .db $00
+   .db 0
 RealADataE:
+RealB:
+   .db RealObj,"B",0
+RealBData:
+   .db 1
+RealBDataE:
 
 LinkFailText:
  .db "LINK FAILED",0 ; this is actually a string of tokens, not ASCII
