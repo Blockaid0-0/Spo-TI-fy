@@ -10,7 +10,6 @@
 ### For the assembly version:
 1. #### Download SPASM and add it to the `src/z80` folder
 2. #### Open the terminal and paste `cd src/z80` and `./spasm64.exe main.asm ../../exec/SPOTIASM.8xp`
-> #### Note that the assembly version is not yet in a working state and is currently being worked on
 ### For the TI-BASIC version:
 1. #### Open the `SPOTIFY.8xp` file in ```src/TI-BASIC``` either
 - Any JetBrains IDE
