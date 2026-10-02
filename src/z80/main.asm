@@ -230,54 +230,36 @@ LinkFailureOne:
    ld hl,stringOne
    rst rMov9ToOP1
    rst rFindSym
-   jp c,LinkFail_NoDeleteStr
+   jp c,exitFailed
    bcall(_DelVarArc)
 LinkFailureTwo:
    ld hl,stringTwo
    rst rMov9ToOP1
    rst rFindSym
-   jp c,LinkFail_NoDeleteStr
+   jp c,exitFailed
    bcall(_DelVarArc)
 LinkFailureThree:
    ld hl,stringThree
    rst rMov9ToOP1
    rst rFindSym
-   jp c,LinkFail_NoDeleteStr
+   jp c,exitFailed
    bcall(_DelVarArc)
 LinkFailureA:
    ld hl,RealA
    rst rMov9ToOP1
    rst rFindSym
-   jp c,LinkFail_NoDeleteReal
+   jp c,exitFailed
    bcall(_DelVarArc)
 LinkFailureB:
    ld hl,RealB
    rst rMov9ToOP1
    rst rFindSym
-   jp c,LinkFail_NoDeleteReal
+   jp c,exitFailed
    bcall(_DelVarArc)
 TempString:
    .block 64
 TempStringE:
 
-LinkFail_NoDeleteStr:
-   ld hl,11
-   push hl
-   bcall(_CreateStrng)
-   inc de
-   inc de
-   ld hl,exitFailed
-   pop bc
-   ldir
-LinkFail_NoDeleteReal:
-   ld hl,11
-   push hl
-   bcall(_CreateReal)
-   inc de
-   inc de
-   ld hl,exitFailed
-   pop bc
-   ldir
 barMath:
    ld hl, RealA
    rst rMov9ToOP1
