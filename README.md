@@ -1,6 +1,6 @@
 # Spo(TI)fy
-Spotify on the TI-84 Plus
-
+### Spotify on the TI-84 Plus
+![example](assets/exImage.jpeg)
 ### TODO: Make better description
 #### [Upcoming features here](https://trello.com/invite/b/6a775f8947624efff6cf8bc8/ATTI86d66a644fbd39037e9389fa5b3325f64B462CF3/spotify)
 
