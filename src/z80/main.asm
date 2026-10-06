@@ -42,6 +42,14 @@ TestStr3:
    bcall(_DelVarArc)
    jp TestStr3
 
+TestStr4:
+   ld hl, stringFour
+   rst rMov9ToOP1
+   rst rFindSym
+   jp C, MakeStr4
+   bcall(_DelVarArc)
+   jp TestStr4
+
 TestA:
    ld hl, RealA
    rst rMov9ToOP1
@@ -82,6 +90,15 @@ MakeStr3:
    inc de
    ld hl, stringDataThree
    ld bc, stringDataThreeE-stringDataThree
+   ldir
+   jp MakeStr4
+MakeStr4:
+   ld hl, stringDataFourE-stringDataFour
+   bcall(_CreateStrng)
+   inc de
+   inc de
+   ld hl, stringDataFour
+   ld bc, stringDataFourE-stringDataFour
    ldir
    jp TestA
 MakeA:
@@ -192,7 +209,7 @@ RenderLoop:
    ld a, e
    cp 0
    call z, fixBar
-   ld (barCompleted), a 
+   ld (barCompleted), a
 
    ld hl, barLine
    ld de, barLineE-barLine
@@ -220,9 +237,17 @@ RenderLoop:
    ld b, 7
    call PopGUIStacks
 
-   bcall(_GetCSC)
-   cp skClear
+   ld a, %11111101
+   out (1), a
+   in a, (1)
+   cp %10111111
    jp z, exit
+
+   ld a, %11110111
+   out (1), a
+   in a, (1)
+   cp %11111011
+   call z, Pausing
 
    jp RenderLoop
 
@@ -240,6 +265,12 @@ LinkFailureTwo:
    bcall(_DelVarArc)
 LinkFailureThree:
    ld hl,stringThree
+   rst rMov9ToOP1
+   rst rFindSym
+   jp c,exitFailed
+   bcall(_DelVarArc)
+LinkFailureFour:
+   ld hl,stringFour
    rst rMov9ToOP1
    rst rFindSym
    jp c,exitFailed
@@ -265,7 +296,7 @@ barMath:
    rst rMov9ToOP1
    call LinkSend
    jp nz,LinkFailureA
-   
+
    ld hl, RealA
    rst rMov9ToOP1
    call LinkRecv
@@ -286,6 +317,12 @@ barMath:
    bcall(_int)
 
    bcall(_ConvOP1)
+   ret
+Pausing:
+   ld hl, stringFour
+   rst rMov9ToOP1
+   call LinkSend
+   jp nz,LinkFailureFour
    ret
 
 fixBar:
@@ -550,6 +587,11 @@ stringThree:
 stringDataThree:
    .db "STR3"
 stringDataThreeE:
+stringFour:
+   .db StrngObj,tVarStrng,tStr4,0
+stringDataFour:
+   .db "PLAY"
+stringDataFourE:
 RealA:
    .db RealObj,tA,0,0
 RealB:
