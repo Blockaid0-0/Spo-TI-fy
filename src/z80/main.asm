@@ -91,7 +91,7 @@ MakeStr3:
    ld hl, stringDataThree
    ld bc, stringDataThreeE-stringDataThree
    ldir
-   jp MakeStr4
+   jp TestA
 MakeStr4:
    ld hl, stringDataFourE-stringDataFour
    bcall(_CreateStrng)
@@ -100,7 +100,7 @@ MakeStr4:
    ld hl, stringDataFour
    ld bc, stringDataFourE-stringDataFour
    ldir
-   jp TestA
+   ret
 MakeA:
    bcall(_CreateReal)
    bcall(_OP1Set0)
@@ -247,7 +247,19 @@ RenderLoop:
    out (1), a
    in a, (1)
    cp %11111011
-   call z, Pausing
+   call z, PlayPause
+
+   ld a, %11111011
+   out (1), a
+   in a, (1)
+   cp %11111011
+   call z, Skipping
+
+   ld a, %11101111
+   out (1), a
+   in a, (1)
+   cp %11111011
+   call z, Replaying
 
    jp RenderLoop
 
@@ -318,11 +330,38 @@ barMath:
 
    bcall(_ConvOP1)
    ret
-Pausing:
+PlayPause:
+   ld hl, PlayText
+   ld de, stringDataFour
+   ld bc, PlayTextE-PlayText
+   ldir
+   call TestStr4
    ld hl, stringFour
    rst rMov9ToOP1
    call LinkSend
-   jp nz,LinkFailureFour
+   jp nz,LinkFailureA
+   ret
+Skipping:
+   ld hl, SkipText
+   ld de, stringDataFour
+   ld bc, SkipTextE-SkipText
+   ldir
+   call TestStr4
+   ld hl, stringFour
+   rst rMov9ToOP1
+   call LinkSend
+   jp nz,LinkFailureA
+   ret
+Replaying:
+   ld hl, ReplayText
+   ld de, stringDataFour
+   ld bc, ReplayTextE-ReplayText
+   ldir
+   call TestStr4
+   ld hl, stringFour
+   rst rMov9ToOP1
+   call LinkSend
+   jp nz,LinkFailureA
    ret
 
 fixBar:
@@ -590,7 +629,7 @@ stringDataThreeE:
 stringFour:
    .db StrngObj,tVarStrng,tStr4,0
 stringDataFour:
-   .db "PLAY"
+   .block 4
 stringDataFourE:
 RealA:
    .db RealObj,tA,0,0
@@ -598,7 +637,18 @@ RealB:
    .db RealObj,tB,0,0
 
 LinkFailText:
- .db "LINK FAILED",0 ; this is actually a string of tokens, not ASCII
+   .db "LINK FAILED",0
+
+PlayText:
+   .db "PLAY"
+PlayTextE:
+SkipText:
+   .db "SKIP"
+SkipTextE:
+ReplayText:
+   .db "REPLAY"
+ReplayTextE:
+
 exitFailed:
    call CloseGUIStack
    bcall(_ClrLCDFull)
