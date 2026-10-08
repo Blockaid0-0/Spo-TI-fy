@@ -69,7 +69,7 @@ int recieveStr(uint8_t type, enum Endpoint model, int dataLen) {
     mainNum = TIVar::realToLong8x(data, model);
     if (mainStr == "PLAY") Serial.println("PLAY");
     if (mainStr == "SKIP") Serial.println("SKIP");
-    if (mainStr == "REPLAY") Serial.println("REPLAY");
+    if (mainStr == "RPLY") Serial.println("REPLAY");
     if (mainStr == "STR1" || mainStr == sendStr[0]) strVar = 1;
     else if (mainStr == "STR2" || mainStr == sendStr[1]) strVar = 2;
     else if (mainStr == "STR3" || mainStr == sendStr[2]) strVar = 3;

@@ -330,6 +330,7 @@ barMath:
 
    bcall(_ConvOP1)
    ret
+
 PlayPause:
    ld hl, PlayText
    ld de, stringDataFour
@@ -631,11 +632,11 @@ stringFour:
 stringDataFour:
    .block 4
 stringDataFourE:
+
 RealA:
    .db RealObj,tA,0,0
 RealB:
    .db RealObj,tB,0,0
-
 LinkFailText:
    .db "LINK FAILED",0
 
@@ -646,7 +647,7 @@ SkipText:
    .db "SKIP"
 SkipTextE:
 ReplayText:
-   .db "REPLAY"
+   .db "RPLY"
 ReplayTextE:
 
 exitFailed:
