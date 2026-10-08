@@ -32,7 +32,7 @@
 2.  Create a simple breadboard follwing this design 
 ![Breadboard](assets/IMG_1868.jpeg)
 ![Connections](assets/articl_msp432.png)
-> Make sure the TIP pin is set to pin 17 and RING pin set to pin 16
+> Make sure the TIP pin is set to pin 17 and RING pin set to pin 16 (update Globals.cpp if you need to)
 3.  Upload the code to the ESP32
 4.  Start the Python program while listening to music
 5.  Connect the link cable to the calculator and ESP32
