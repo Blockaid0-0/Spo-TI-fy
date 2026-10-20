@@ -1,19 +1,22 @@
-.nolist
 #include "include/ti83plus.inc"
 #include "include/dcs7.inc"
-.list
-   .org progstart
-   .db $BB,$6D
+
+.binarymode ti8x
+.define SafeRam saveSScreen
+.org userMem-2
+.db t2ByteTok,tAsmCmp
+
+.variablename "SPOTIFY"
 
 Init:
    xor d
    ret
    jp Start
 
-   .dw $0000         
-   .db $07,$00       
-   .dw $0000         
-   .dw $0000         
+   .dw $0000
+   .db $07,$00
+   .dw $0000
+   .dw $0000
 Start:
    bcall(_RunIndicOff)
    jp TestStr1
@@ -41,14 +44,6 @@ TestStr3:
    jp C, MakeStr3
    bcall(_DelVarArc)
    jp TestStr3
-
-TestStr4:
-   ld hl, stringFour
-   rst rMov9ToOP1
-   rst rFindSym
-   jp C, MakeStr4
-   bcall(_DelVarArc)
-   jp TestStr4
 
 TestA:
    ld hl, RealA
@@ -92,15 +87,6 @@ MakeStr3:
    ld bc, stringDataThreeE-stringDataThree
    ldir
    jp TestA
-MakeStr4:
-   ld hl, stringDataFourE-stringDataFour
-   bcall(_CreateStrng)
-   inc de
-   inc de
-   ld hl, stringDataFour
-   ld bc, stringDataFourE-stringDataFour
-   ldir
-   ret
 MakeA:
    bcall(_CreateReal)
    bcall(_OP1Set0)
@@ -237,29 +223,9 @@ RenderLoop:
    ld b, 7
    call PopGUIStacks
 
-   ld a, %11111101
-   out (1), a
-   in a, (1)
-   cp %10111111
+   bcall(_GetCSC)
+   cp skClear
    jp z, exit
-
-   ld a, %11110111
-   out (1), a
-   in a, (1)
-   cp %11111011
-   call z, PlayPause
-
-   ld a, %11111011
-   out (1), a
-   in a, (1)
-   cp %11111011
-   call z, Skipping
-
-   ld a, %11101111
-   out (1), a
-   in a, (1)
-   cp %11111011
-   call z, Replaying
 
    jp RenderLoop
 
@@ -267,42 +233,54 @@ LinkFailureOne:
    ld hl,stringOne
    rst rMov9ToOP1
    rst rFindSym
-   jp c,exitFailed
+   jp c,LinkFail_NoDeleteStr
    bcall(_DelVarArc)
 LinkFailureTwo:
    ld hl,stringTwo
    rst rMov9ToOP1
    rst rFindSym
-   jp c,exitFailed
+   jp c,LinkFail_NoDeleteStr
    bcall(_DelVarArc)
 LinkFailureThree:
    ld hl,stringThree
    rst rMov9ToOP1
    rst rFindSym
-   jp c,exitFailed
-   bcall(_DelVarArc)
-LinkFailureFour:
-   ld hl,stringFour
-   rst rMov9ToOP1
-   rst rFindSym
-   jp c,exitFailed
+   jp c,LinkFail_NoDeleteStr
    bcall(_DelVarArc)
 LinkFailureA:
    ld hl,RealA
    rst rMov9ToOP1
    rst rFindSym
-   jp c,exitFailed
+   jp c,LinkFail_NoDeleteReal
    bcall(_DelVarArc)
 LinkFailureB:
    ld hl,RealB
    rst rMov9ToOP1
    rst rFindSym
-   jp c,exitFailed
+   jp c,LinkFail_NoDeleteReal
    bcall(_DelVarArc)
 TempString:
    .block 64
 TempStringE:
 
+LinkFail_NoDeleteStr:
+   ld hl,11
+   push hl
+   bcall(_CreateStrng)
+   inc de
+   inc de
+   ld hl,exitFailed
+   pop bc
+   ldir
+LinkFail_NoDeleteReal:
+   ld hl,11
+   push hl
+   bcall(_CreateReal)
+   inc de
+   inc de
+   ld hl,exitFailed
+   pop bc
+   ldir
 barMath:
    ld hl, RealA
    rst rMov9ToOP1
@@ -329,40 +307,6 @@ barMath:
    bcall(_int)
 
    bcall(_ConvOP1)
-   ret
-
-PlayPause:
-   ld hl, PlayText
-   ld de, stringDataFour
-   ld bc, PlayTextE-PlayText
-   ldir
-   call TestStr4
-   ld hl, stringFour
-   rst rMov9ToOP1
-   call LinkSend
-   jp nz,LinkFailureA
-   ret
-Skipping:
-   ld hl, SkipText
-   ld de, stringDataFour
-   ld bc, SkipTextE-SkipText
-   ldir
-   call TestStr4
-   ld hl, stringFour
-   rst rMov9ToOP1
-   call LinkSend
-   jp nz,LinkFailureA
-   ret
-Replaying:
-   ld hl, ReplayText
-   ld de, stringDataFour
-   ld bc, ReplayTextE-ReplayText
-   ldir
-   call TestStr4
-   ld hl, stringFour
-   rst rMov9ToOP1
-   call LinkSend
-   jp nz,LinkFailureA
    ret
 
 fixBar:
@@ -490,7 +434,7 @@ ConvTok_FromStrng_Exit:
    ret
 ConvTok:
    push de
-Minus:
+-:
    push hl
    push de
    bcall(_Get_Tok_Strng)
@@ -505,7 +449,7 @@ ConvTok_OneByte:
    inc hl
    ld a,(hl)
    or a
-   jp nz,Minus
+   jp nz,{-}
    xor a
    ld (de),a
    ex de,hl
@@ -627,29 +571,13 @@ stringThree:
 stringDataThree:
    .db "STR3"
 stringDataThreeE:
-stringFour:
-   .db StrngObj,tVarStrng,tStr4,0
-stringDataFour:
-   .block 4
-stringDataFourE:
-
 RealA:
    .db RealObj,tA,0,0
 RealB:
    .db RealObj,tB,0,0
+
 LinkFailText:
-   .db "LINK FAILED",0
-
-PlayText:
-   .db "PLAY"
-PlayTextE:
-SkipText:
-   .db "SKIP"
-SkipTextE:
-ReplayText:
-   .db "RPLY"
-ReplayTextE:
-
+ .db "LINK FAILED",0 ; this is actually a string of tokens, not ASCII
 exitFailed:
    call CloseGUIStack
    bcall(_ClrLCDFull)

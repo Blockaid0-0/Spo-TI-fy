@@ -8,10 +8,9 @@
 ## Setup:
 
 ### For the Calculator Program:
-1.  Download [SPASM](https://github.com/alberthdev/spasm-ng/releases/tag/v0.5-beta.3) and add it to the `src/z80` folder
-> If you don't know which one to choose, Just choose the Windows 64-bit version 
+1.  Download [Brass]([https://github.com/alberthdev/spasm-ng/releases/tag/v0.5-beta.3](https://benryves.github.io/Brass/Manual/)) and add it to the `src/z80` folder
 2.  Create the `exec` directory in the root of the project
-2.  Open the terminal and paste `cd src/z80` and `./spasm64.exe main.asm ../../exec/SPOTIFY.8xp`
+2.  Open the terminal and paste `cd src/z80` and `./Brass.exe ./main.asm  ../../exec/MAIN.8xp `
 
 ### For the ESP32:
 1.  Download the Platform IO plugin on either
